@@ -185,6 +185,141 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-mysql-binlog-replication-protocol" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/12/mysql-binlog-replication-protocol/">详解mysql binlog 复制协议</a>
+    </h1>
+  
+
+        
+        <a href="/2021/08/12/mysql-binlog-replication-protocol/" class="archive-article-date">
+  	<time datetime="2021-08-12T02:18:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>前段时间在做实时数据同步项目，使用了mysql binlog同步技术，其核心是mysql的复制协议，于是我顺便就仔细研究了一下这个协议</p>
+<h3 id="Binlog-File"><a href="#Binlog-File" class="headerlink" title="Binlog File"></a>Binlog File</h3><p>mysql的各种操作事件（insert,update,delete,alert等）会记录到binlog-file里。Binlog文件格式由Binlog Header(文件头)和Binlog Event组成。</p>
+<h3 id="Binlog-version"><a href="#Binlog-version" class="headerlink" title="Binlog version"></a>Binlog version</h3><p>binlog格式目前有4个不同版本<br><img src="/mysql-binlog-replication-protocol/20210812104354331.png"><br>摘自官网如下</p>
+<ul>
+<li><p>Version 1</p>
+<blockquote>
+<p>supported statement based replication events</p>
+</blockquote>
+</li>
+<li><p>Version 2</p>
+<blockquote>
+<p>can be ignored as it was only used in early alpha versions of MySQL 4.1.x and won’t be documented here</p>
+</blockquote>
+</li>
+<li><p>Version 3</p>
+<blockquote>
+<p>added the relay logs and changed the meaning of the log position</p>
+</blockquote>
+</li>
+<li><p>Version 4</p>
+<blockquote>
+<p>added the FORMAT_DESCRIPTION_EVENT and made the protocol extensible</p>
+<p>In MySQL 5.1.x the Row Based Replication Events were added.</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="Binlog-event"><a href="#Binlog-event" class="headerlink" title="Binlog event"></a>Binlog event</h3><p>Binlog event主要记录的各种操作东西，主要由 <strong><em>Binlog Event header</em></strong> 和 Event Body 组成<br>依赖于不同的版本，binlog event事件由很多，其中最重要和复杂的莫过于 Row Based Replication Events 相关事件，里面包括了数据的各种insert,update,delete事件。<br>如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TABLE_MAP_EVENT</span><br><span class="line">DELETE_ROWS_EVENTv0</span><br><span class="line">UPDATE_ROWS_EVENTv0</span><br><span class="line">WRITE_ROWS_EVENTv0</span><br><span class="line">DELETE_ROWS_EVENTv1</span><br><span class="line">UPDATE_ROWS_EVENTv1</span><br><span class="line">WRITE_ROWS_EVENTv1</span><br><span class="line">DELETE_ROWS_EVENTv2</span><br><span class="line">UPDATE_ROWS_EVENTv2</span><br><span class="line">WRITE_ROWS_EVENTv2</span><br></pre></td></tr></table></figure>
+<p>由三个不同版本，分别对应不同的mysql版本</p>
+<ul>
+<li>Version 0 <ul>
+<li>from MySQL 5.1.0 to 5.1.15</li>
+</ul>
+</li>
+<li>Version 1<ul>
+<li>from MySQL 5.1.15 to 5.6.x</li>
+</ul>
+</li>
+<li>Version 2<ul>
+<li>from MySQL 5.6.x</li>
+</ul>
+</li>
+</ul>
+<h3 id="Binlog-dump"><a href="#Binlog-dump" class="headerlink" title="Binlog dump"></a>Binlog dump</h3><p>当一个slave从库需要同步master的binlog的时候，需要向master发送一些请求命令去告诉master我要同步binlog。第一个请求命令就是**<em>COM_REGISTER_SLAVE**</em> ，向master注册。发送如下消息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1              [15] COM_REGISTER_SLAVE</span><br><span class="line">4              server-id</span><br><span class="line">1              slaves hostname length</span><br><span class="line">string[$len]   slaves hostname</span><br><span class="line">1              slaves user len</span><br><span class="line">string[$len]   slaves user</span><br><span class="line">1              slaves password len</span><br><span class="line">string[$len]   slaves password</span><br><span class="line">2              slaves mysql-port</span><br><span class="line">4              replication rank</span><br><span class="line">4              master-id</span><br></pre></td></tr></table></figure>
+<p>其中最重要的是server_id,必须全局唯一</p>
+<ul>
+<li>server_id (4) – the slaves server-id<blockquote>
+<p>奇怪的是，我看debezium源码里面并没有 COM_REGISTER_SLAVE 主要命令的发送，也可以进行同步</p>
+</blockquote>
+</li>
+</ul>
+<p>接下来就是发送dump命令了。COM_BINLOG_DUMP 通过带上binlog-filename和position 就可以获取指定位置的binlog event了。<br>在mysql 5.6之后，支持另外一种dump命令，COM_BINLOG_DUMP_GTID ,gtid dump，这种命令是为了解决mysql进行HA切换过程中找position问题，因为老的方式在HA切换中无法精确定位position 需要人工介入。通过gtid方式后 就不需要人为找position了，master会自动算出需要同步的position。</p>
+<h3 id="end"><a href="#end" class="headerlink" title="end"></a>end</h3><p>mysql复制协议总的来说比较复杂，要实现一个binlog复制协议也是很有挑战的一件事情，因为mysql有多个不同的协议版本，要兼容每一个版本也是很麻烦的事情。好在有很多开源项目已经帮我们做了这个复杂的工作，感谢致敬～～～</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">binlog</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">mysql-replication</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/12/mysql-binlog-replication-protocol/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-flink-cdc-source-code-analysis" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1154,86 +1289,6 @@ PackagedProgram 里 getJobJarAndDependencies 方法，该方法收集了job所�
 
 
   
-    <article id="post-mysql-transaction-deep-defination" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/08/mysql-transaction-deep-defination/">MySQL是怎么保证数据一致性的</a>
-    </h1>
-  
-
-        
-        <a href="/2020/03/08/mysql-transaction-deep-defination/" class="archive-article-date">
-  	<time datetime="2020-03-08T08:42:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-08</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在《写数据库同时发mq消息事务一致性的一种解决方案》一文的方案中把分布式事务巧妙转成了数据库事务。我们都知道关系型数据库事务能保证数据一致性，那数据库到底是怎么设计事务这一特性的呢？</p>
-        
-          <a class="article-more-a" href="/2020/03/08/mysql-transaction-deep-defination/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">事物</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/08/mysql-transaction-deep-defination/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1432,6 +1487,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">binlog</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">mysql-replication</a>
               </li>
             
             <div class="clearfix"></div>
