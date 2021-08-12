@@ -248,7 +248,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="Binlog-dump"><a href="#Binlog-dump" class="headerlink" title="Binlog dump"></a>Binlog dump</h3><p>当一个slave从库需要同步master的binlog的时候，需要向master发送一些请求命令去告诉master我要同步binlog。第一个请求命令就是**<em>COM_REGISTER_SLAVE**</em> ，向master注册。发送如下消息：</p>
+<h3 id="Binlog-dump"><a href="#Binlog-dump" class="headerlink" title="Binlog dump"></a>Binlog dump</h3><p>当一个slave从库需要同步master的binlog的时候，需要向master发送一些请求命令去告诉master我要同步binlog。第一个请求命令就是*** COM_REGISTER_SLAVE *** ，向master注册。发送如下消息：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1              [15] COM_REGISTER_SLAVE</span><br><span class="line">4              server-id</span><br><span class="line">1              slaves hostname length</span><br><span class="line">string[$len]   slaves hostname</span><br><span class="line">1              slaves user len</span><br><span class="line">string[$len]   slaves user</span><br><span class="line">1              slaves password len</span><br><span class="line">string[$len]   slaves password</span><br><span class="line">2              slaves mysql-port</span><br><span class="line">4              replication rank</span><br><span class="line">4              master-id</span><br></pre></td></tr></table></figure>
 <p>其中最重要的是server_id,必须全局唯一</p>
 <ul>
