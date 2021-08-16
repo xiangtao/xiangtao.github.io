@@ -17,8 +17,9 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://herden.gitee.io/mysql-binlog-replication-protocol/20210812104354331.png">
 <meta property="article:published_time" content="2021-08-12T02:18:51.000Z">
-<meta property="article:modified_time" content="2021-08-13T02:08:07.325Z">
+<meta property="article:modified_time" content="2021-08-16T11:34:04.779Z">
 <meta property="article:author" content="taox">
+<meta property="article:tag" content="flink">
 <meta property="article:tag" content="mysql">
 <meta property="article:tag" content="binlog">
 <meta property="article:tag" content="mysql-replication">
@@ -237,6 +238,8 @@
 </blockquote>
 </li>
 </ul>
+<span id="more"></span>
+
 <h3 id="Binlog-event"><a href="#Binlog-event" class="headerlink" title="Binlog event"></a>Binlog event</h3><p>Binlog event主要记录的各种操作东西，主要由 <strong><em>Binlog Event header</em></strong> 和 Event Body 组成<br>依赖于不同的版本，binlog event事件由很多，其中最重要和复杂的莫过于 Row Based Replication Events 相关事件，里面包括了数据的各种insert,update,delete事件。<br>如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TABLE_MAP_EVENT</span><br><span class="line">DELETE_ROWS_EVENTv0</span><br><span class="line">UPDATE_ROWS_EVENTv0</span><br><span class="line">WRITE_ROWS_EVENTv0</span><br><span class="line">DELETE_ROWS_EVENTv1</span><br><span class="line">UPDATE_ROWS_EVENTv1</span><br><span class="line">WRITE_ROWS_EVENTv1</span><br><span class="line">DELETE_ROWS_EVENTv2</span><br><span class="line">UPDATE_ROWS_EVENTv2</span><br><span class="line">WRITE_ROWS_EVENTv2</span><br></pre></td></tr></table></figure>
 <p>由三个不同版本，分别对应不同的mysql版本</p>
@@ -308,6 +311,10 @@
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
+        		</li>
+      		 
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
         		</li>
@@ -389,7 +396,7 @@
   
   
     <a href="/2021/08/04/flink-cdc-source-code-analysis/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Flink-cdc-connector源码分析</div>
+      <div class="article-nav-title">【flink源码】Flink-cdc-connector源码分析</div>
       <i class="icon-circle-right"></i>
     </a>
   

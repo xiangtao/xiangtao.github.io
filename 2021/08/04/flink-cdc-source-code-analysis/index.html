@@ -6,17 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://herden.gitee.io">
-  <title>Flink-cdc-connector源码分析 | taox的博客|开发者驿站</title>
+  <title>【flink源码】Flink-cdc-connector源码分析 | taox的博客|开发者驿站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="什么是cdcCDC 的全称是 Change Data Capture ，在广义的概念上，只要能捕获数据变更的技术，我们都可以称为 CDC 。通常我们说的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。CDC 技术应用场景非常广泛：  数据同步，用于备份，容灾 数据分发，一个数据源分发给多个下游 数据采集(E)，面向数据仓库&#x2F;数据湖的 ETL 数据集成  常用的cdc技术实">
+  <meta name="description" content="什么是cdcCDC 的全称是 Change Data Capture ，在广义的概念上，只要能捕获数据变更的技术，我们都可以称为 CDC 。通常我们说的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。CDC 技术应用场景非常广泛：  数据同步，用于备份，容灾 数据分发，一个数据源分发给多个下游 数据采集(E)，面向数据仓库&#x2F;数据湖的 ETL 数据集成">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Flink-cdc-connector源码分析">
+<meta property="og:title" content="【flink源码】Flink-cdc-connector源码分析">
 <meta property="og:url" content="https://herden.gitee.io/2021/08/04/flink-cdc-source-code-analysis/index.html">
 <meta property="og:site_name" content="taox的博客|开发者驿站">
-<meta property="og:description" content="什么是cdcCDC 的全称是 Change Data Capture ，在广义的概念上，只要能捕获数据变更的技术，我们都可以称为 CDC 。通常我们说的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。CDC 技术应用场景非常广泛：  数据同步，用于备份，容灾 数据分发，一个数据源分发给多个下游 数据采集(E)，面向数据仓库&#x2F;数据湖的 ETL 数据集成  常用的cdc技术实">
+<meta property="og:description" content="什么是cdcCDC 的全称是 Change Data Capture ，在广义的概念上，只要能捕获数据变更的技术，我们都可以称为 CDC 。通常我们说的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。CDC 技术应用场景非常广泛：  数据同步，用于备份，容灾 数据分发，一个数据源分发给多个下游 数据采集(E)，面向数据仓库&#x2F;数据湖的 ETL 数据集成">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-04T08:32:45.000Z">
-<meta property="article:modified_time" content="2021-08-11T10:13:27.427Z">
+<meta property="article:modified_time" content="2021-08-16T11:33:34.001Z">
 <meta property="article:author" content="taox">
 <meta property="article:tag" content="flink">
 <meta property="article:tag" content="flink-cdc">
@@ -196,7 +196,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Flink-cdc-connector源码分析
+      【flink源码】Flink-cdc-connector源码分析
     </h1>
   
 
@@ -215,6 +215,8 @@
 <li>数据分发，一个数据源分发给多个下游</li>
 <li>数据采集(E)，面向数据仓库/数据湖的 ETL 数据集成</li>
 </ul>
+<span id="more"></span>
+
 <h1 id="常用的cdc技术实现"><a href="#常用的cdc技术实现" class="headerlink" title="常用的cdc技术实现"></a>常用的cdc技术实现</h1><p>目前业界开源的实现技术主要有，canal , debezium , maxwell 这三种 ，具体比较这里不详细解读了（参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/75357900">https://zhuanlan.zhihu.com/p/75357900</a> ）</p>
 <h1 id="Flink-cdc-connector源码分析"><a href="#Flink-cdc-connector源码分析" class="headerlink" title="Flink-cdc-connector源码分析"></a>Flink-cdc-connector源码分析</h1><p>flink-cdc-connector 使用了debezium-embeded-engine来实现从mysql获取binlog日志事件。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">debezium本来是作为一个kafka connect plugin service 来实现的，后面 debezium社区把它抽象出来了，可以独立于kafka connect 来使用</span><br></pre></td></tr></table></figure>
