@@ -207,30 +207,6 @@
       
         <p>前段时间在做实时数据同步项目，使用了mysql binlog同步技术，其核心是mysql的复制协议，于是我顺便就仔细研究了一下这个协议</p>
 <h3 id="Binlog-File"><a href="#Binlog-File" class="headerlink" title="Binlog File"></a>Binlog File</h3><p>mysql的各种操作事件（insert,update,delete,alert等）会记录到binlog-file里。Binlog文件格式由Binlog Header(文件头)和Binlog Event组成。</p>
-<h3 id="Binlog-version"><a href="#Binlog-version" class="headerlink" title="Binlog version"></a>Binlog version</h3><p>binlog格式目前有4个不同版本<br><img src="/mysql-binlog-replication-protocol/20210812104354331.png"><br>摘自官网如下</p>
-<ul>
-<li><p>Version 1</p>
-<blockquote>
-<p>supported statement based replication events</p>
-</blockquote>
-</li>
-<li><p>Version 2</p>
-<blockquote>
-<p>can be ignored as it was only used in early alpha versions of MySQL 4.1.x and won’t be documented here</p>
-</blockquote>
-</li>
-<li><p>Version 3</p>
-<blockquote>
-<p>added the relay logs and changed the meaning of the log position</p>
-</blockquote>
-</li>
-<li><p>Version 4</p>
-<blockquote>
-<p>added the FORMAT_DESCRIPTION_EVENT and made the protocol extensible</p>
-<p>In MySQL 5.1.x the Row Based Replication Events were added.</p>
-</blockquote>
-</li>
-</ul>
         
           <a class="article-more-a" href="/2021/08/12/mysql-binlog-replication-protocol/#more">more >></a>
         
@@ -405,60 +381,9 @@
 <li>在引擎层之上就是平台层了，平台层从数据、任务和资源三个视角去管理。</li>
 <li>架构的最上层是应用层，包括了实时数仓、机器学习、数据同步以及事件驱动应用等。</li>
 </ul>
-<h3 id="业务场景"><a href="#业务场景" class="headerlink" title="业务场景"></a>业务场景</h3><ul>
-<li>流量数仓 </li>
-<li>业务数仓</li>
-<li>特征数仓</li>
-</ul>
-<h3 id="实时数仓建设方式"><a href="#实时数仓建设方式" class="headerlink" title="实时数仓建设方式"></a>实时数仓建设方式</h3><ul>
-<li><p>准实时数仓</p>
-</li>
-<li><p>实时数仓 </p>
-<blockquote>
-<p>实时数仓的两种建设方式，即准实时数仓和实时数仓两种方式进行了对比。它们的实现方式分别是基于 OLAP 引擎和流计算引擎，实时度则分别是分钟和秒级。</p>
-</blockquote>
-</li>
-<li><p>在调度开销方面，准实时数仓是批处理过程，因此仍然需要调度系统支持，虽然调度开销比离线数仓少一些，但是依然存在，而实时数仓却没有调度开销。</p>
-</li>
-<li><p>在业务灵活性方面，因为准实时数仓基于 OLAP 引擎实现，灵活性优于基于流计算的方式。</p>
-</li>
-<li><p>在对数据晚到的容忍度方面，因为准实时数仓可以基于一个周期内的数据进行全量计算，因此对于数据晚到的容忍度也是比较高的，而实时数仓使用的是增量计算，对于数据晚到的容忍度更低一些。</p>
-</li>
-<li><p>在扩展性方面，因为准实时数仓的计算和存储是一体的，因此相比于实时数仓，扩展性更弱一些。</p>
-</li>
-<li><p>在适用场景方面，准实时数仓主要用于有实时性要求但不太高、数据量不大以及多表关联复杂和业务变更频繁的场景，如交易类型的实时分析，实时数仓则更适用于实时性要求高、数据量大的场景，如实时特征、流量分发以及流量类型实时分析。</p>
-</li>
-</ul>
-<p><img src="/20210713104502690/20210713111104589.png"></p>
-<p>总结： </p>
-<ul>
-<li>根据业务场景不同选择不同的架构方式，没有一种架构是包治百病的</li>
-</ul>
-<h3 id="一站式解决方案-实时开发平台"><a href="#一站式解决方案-实时开发平台" class="headerlink" title="一站式解决方案-实时开发平台"></a>一站式解决方案-实时开发平台</h3><p><img src="/20210713104502690/20210713112335156.png"></p>
-<ul>
-<li>引擎层<blockquote>
-<p>flink connector 扩展和集成</p>
-</blockquote>
-</li>
-<li>SQL层：<blockquote>
-<p>统一sql解析，校验 </p>
-</blockquote>
-</li>
-<li>平台层<blockquote>
-<p>sql ide 支持，udf管理，olap平台 ，元数据</p>
-</blockquote>
-</li>
-</ul>
-<h3 id="好未来实时开发平台"><a href="#好未来实时开发平台" class="headerlink" title="好未来实时开发平台"></a>好未来实时开发平台</h3><p><img src="/20210713104502690/20210713120024934.png"></p>
-<ul>
-<li><strong>数据集成</strong> 方面，我们支持数据库、埋点数据、服务端日志数据的集成，为了能够提高数据集成的效率，我们提供了很多的通用模板作业，用户只需要配置即可快速实现数据的集成。</li>
-<li><strong>数据开发</strong> 方面，我们支持两种方式的作业开发，一种是 Flink SQL 作业开发、一种是 Flink Jar 包托管，在 Flink SQL 开发上我们内置了很多 UDF 函数，比如可以通过 UDF 函数实现维表 join，也支持用户自定义 UDF，并且实现了 UDF 的热加载。除此之外，我们也会记录用户在作业开发过程中的元数据信息，方便血缘系统的建设。</li>
-<li><strong>作业保障</strong> 方面，我们支持作业状态监控、异常告警、作业失败之后的自动拉起，作业自动拉起我们会自动选择可用的 checkpoint 版本进行拉起，同时也支持作业在多集群之间的切换。</li>
-<li><strong>资源管理</strong> 方面，我们支持平台多租户，每个租户使用 namespace 进行隔离、实现了不同事业部、不同用户、不同版本的 Flink 客户端隔离、实现了计算资源的隔离。</li>
-<li><strong>数据安全</strong> 方面，我们支持角色权限管理、表级别权限管理、操作审计日志查询等功能。</li>
-</ul>
-<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><p><img src="/flink-plat/20210713043126531.png"></p>
-
+        
+          <a class="article-more-a" href="/2021/07/13/flink-plat/#more">more >></a>
+        
       
 
       

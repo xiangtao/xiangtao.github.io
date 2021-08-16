@@ -8,16 +8,16 @@
   <link rel="dns-prefetch" href="https://herden.gitee.io">
   <title>详解mysql binlog 复制协议 | taox的博客|开发者驿站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前段时间在做实时数据同步项目，使用了mysql binlog同步技术，其核心是mysql的复制协议，于是我顺便就仔细研究了一下这个协议 Binlog Filemysql的各种操作事件（insert,update,delete,alert等）会记录到binlog-file里。Binlog文件格式由Binlog Header(文件头)和Binlog Event组成。 Binlog versionbin">
+  <meta name="description" content="前段时间在做实时数据同步项目，使用了mysql binlog同步技术，其核心是mysql的复制协议，于是我顺便就仔细研究了一下这个协议 Binlog Filemysql的各种操作事件（insert,update,delete,alert等）会记录到binlog-file里。Binlog文件格式由Binlog Header(文件头)和Binlog Event组成。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="详解mysql binlog 复制协议">
 <meta property="og:url" content="https://herden.gitee.io/2021/08/12/mysql-binlog-replication-protocol/index.html">
 <meta property="og:site_name" content="taox的博客|开发者驿站">
-<meta property="og:description" content="前段时间在做实时数据同步项目，使用了mysql binlog同步技术，其核心是mysql的复制协议，于是我顺便就仔细研究了一下这个协议 Binlog Filemysql的各种操作事件（insert,update,delete,alert等）会记录到binlog-file里。Binlog文件格式由Binlog Header(文件头)和Binlog Event组成。 Binlog versionbin">
+<meta property="og:description" content="前段时间在做实时数据同步项目，使用了mysql binlog同步技术，其核心是mysql的复制协议，于是我顺便就仔细研究了一下这个协议 Binlog Filemysql的各种操作事件（insert,update,delete,alert等）会记录到binlog-file里。Binlog文件格式由Binlog Header(文件头)和Binlog Event组成。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://herden.gitee.io/mysql-binlog-replication-protocol/20210812104354331.png">
 <meta property="article:published_time" content="2021-08-12T02:18:51.000Z">
-<meta property="article:modified_time" content="2021-08-16T11:34:04.779Z">
+<meta property="article:modified_time" content="2021-08-16T11:37:15.903Z">
 <meta property="article:author" content="taox">
 <meta property="article:tag" content="flink">
 <meta property="article:tag" content="mysql">
@@ -214,6 +214,8 @@
       
         <p>前段时间在做实时数据同步项目，使用了mysql binlog同步技术，其核心是mysql的复制协议，于是我顺便就仔细研究了一下这个协议</p>
 <h3 id="Binlog-File"><a href="#Binlog-File" class="headerlink" title="Binlog File"></a>Binlog File</h3><p>mysql的各种操作事件（insert,update,delete,alert等）会记录到binlog-file里。Binlog文件格式由Binlog Header(文件头)和Binlog Event组成。</p>
+<span id="more"></span>
+
 <h3 id="Binlog-version"><a href="#Binlog-version" class="headerlink" title="Binlog version"></a>Binlog version</h3><p>binlog格式目前有4个不同版本<br><img src="/mysql-binlog-replication-protocol/20210812104354331.png"><br>摘自官网如下</p>
 <ul>
 <li><p>Version 1</p>
@@ -238,8 +240,6 @@
 </blockquote>
 </li>
 </ul>
-<span id="more"></span>
-
 <h3 id="Binlog-event"><a href="#Binlog-event" class="headerlink" title="Binlog event"></a>Binlog event</h3><p>Binlog event主要记录的各种操作东西，主要由 <strong><em>Binlog Event header</em></strong> 和 Event Body 组成<br>依赖于不同的版本，binlog event事件由很多，其中最重要和复杂的莫过于 Row Based Replication Events 相关事件，里面包括了数据的各种insert,update,delete事件。<br>如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TABLE_MAP_EVENT</span><br><span class="line">DELETE_ROWS_EVENTv0</span><br><span class="line">UPDATE_ROWS_EVENTv0</span><br><span class="line">WRITE_ROWS_EVENTv0</span><br><span class="line">DELETE_ROWS_EVENTv1</span><br><span class="line">UPDATE_ROWS_EVENTv1</span><br><span class="line">WRITE_ROWS_EVENTv1</span><br><span class="line">DELETE_ROWS_EVENTv2</span><br><span class="line">UPDATE_ROWS_EVENTv2</span><br><span class="line">WRITE_ROWS_EVENTv2</span><br></pre></td></tr></table></figure>
 <p>由三个不同版本，分别对应不同的mysql版本</p>
