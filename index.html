@@ -185,6 +185,88 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-flink-cdc-2-demo" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/18/flink-cdc-2-demo/">Flink cdc 2.0 尝鲜</a>
+    </h1>
+  
+
+        
+        <a href="/2021/08/18/flink-cdc-2-demo/" class="archive-article-date">
+  	<time datetime="2021-08-18T09:22:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-18</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Flink-cdc-2-0-尝鲜"><a href="#Flink-cdc-2-0-尝鲜" class="headerlink" title="Flink cdc 2.0 尝鲜"></a>Flink cdc 2.0 尝鲜</h2><p>前几天flink cdc 发布了2.0版本，于是就跟进了一下。<br>2.0版本主要解决1.x里的几个重要问题，如下：</p>
+<ol>
+<li><p>全量 + 增量读取的过程需要保证所有数据的一致性，因此需要通过加锁保证，但是加锁在数据库层面上是一个十分高危的操作。底层 Debezium 在保证数据一致性时，需要对读取的库或表加锁，全局锁可能导致数据库锁住，表级锁会锁住表的读，DBA 一般不给锁权限。</p>
+        
+          <a class="article-more-a" href="/2021/08/18/flink-cdc-2-demo/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">flink cdc</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/18/flink-cdc-2-demo/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-mysql-binlog-replication-protocol" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1001,98 +1083,6 @@
 
 
   
-    <article id="post-etl-system-desc" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/12/etl-system-desc/">几种大数据ETL工作流调度系统的介绍和对比</a>
-    </h1>
-  
-
-        
-        <a href="/2020/03/12/etl-system-desc/" class="archive-article-date">
-  	<time datetime="2020-03-12T04:12:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-12</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1-什么是ETL工作流系统"><a href="#1-什么是ETL工作流系统" class="headerlink" title="1. 什么是ETL工作流系统"></a>1. 什么是ETL工作流系统</h4><p>做过ETL的同学都知道，我们在处理数据的时候往往都是分成好几个任务步骤来完成一个数据处理流程。多个任务单元之间往往有着强依赖关系，上游任务执行并成功，下游任务才可以执行。比如上游任务结束后拿到 A 结果，下游任务需结合 A 结果才能产出 B 结果，因此下游任务的开始一定是在上游任务成功运行拿到结果之后才可以开始。而为了保证数据处理结果的准确性，就必须要求这些任务按照上下游依赖关系有序、高效的执行。<br>ETL调度系统就是这样可以组织任务前后依赖关系，让任务有序执行的关键系统。<br>在开源的世界里，目前有这三种调度系统来供我们免费使用，它们是，Airflow,Azkaban,Dolphin scheduler。下面我分别来介绍一下这三个调度系统的架构和工作原理</p>
-        
-          <a class="article-more-a" href="/2020/03/12/etl-system-desc/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">airflow</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">azkaban</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">dolphin</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">工作流调度</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">调度系统</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/12/etl-system-desc/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1295,6 +1285,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">mysql-replication</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
               </li>
             
             <div class="clearfix"></div>

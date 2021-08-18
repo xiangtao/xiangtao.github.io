@@ -185,6 +185,144 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-springboot-graceful-shutdown" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/02/14/springboot-graceful-shutdown/">优雅的关闭springboot应用</a>
+    </h1>
+  
+
+        
+        <a href="/2020/02/14/springboot-graceful-shutdown/" class="archive-article-date">
+  	<time datetime="2020-02-14T08:08:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>最近我开发了一个基于springboot的服务,服务从网络接收请求，再把请求任务放入队列里交给线程池取异步消费请求任务。<br>后来发现这个服务有个bug修复后需要重新发布到线上，这时需要停止服务更新jar包，那么我们怎么样停止服务才能保证任务队列里的请求都处理完成了呢？不然有可能会丢掉一些请求。这在高并发流量的服务很常见。</p>
+<h3 id="停止进程"><a href="#停止进程" class="headerlink" title="停止进程"></a>停止进程</h3><p>linux中停止进程的方式主要使用kill命令，该命令后面可以接信号量参数，这个信号量会传递给相应进程并根据信号执行相应的处理</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">kill</span> [-s 信号声明 | -n 信号编号 | -信号声明] 进程号 </span><br></pre></td></tr></table></figure>
+<p>常用的停止进程的信号有两种： </p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SIGTERM</td>
+<td>15</td>
+<td>结束程序(可以被捕获、阻塞或忽略)</td>
+</tr>
+<tr>
+<td>SIGKILL</td>
+<td>9</td>
+<td>无条件结束程序(不能被捕获、阻塞或忽略)</td>
+</tr>
+<tr>
+<td>kill-9 pid 可以理解为操作系统从内核级别强行杀死某个进程</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>kill-15 pid 则可以理解为发送一个通知，告知应用主动关闭</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="Java服务停止方式"><a href="#Java服务停止方式" class="headerlink" title="Java服务停止方式"></a>Java服务停止方式</h3><p>我们知道使用kill -15 可以向进程发送一个通知告知现在要关闭服务，请做好善后工作。那么Java中怎么响应这个通知呢？<br>Java提供了shutdown hook的勾子机制，通过调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Runtime.getRuntime().addShutdownHook(Thread hook);</span><br></pre></td></tr></table></figure>
+<p>可以向jvm注册一个线程，当执行kill -15的时候jvm会调用这个线程并等待这个线程执行完毕，最后退出jvm。</p>
+<h3 id="springboot优雅停止方式"><a href="#springboot优雅停止方式" class="headerlink" title="springboot优雅停止方式"></a>springboot优雅停止方式</h3><p>springboot应用本质上是一个Java应用，所以停止原理就如上面所述。<br>但是实际上springboot服务可能很复杂，依赖的资源比较多。怎么保证按照指定的顺序关闭资源呢？<br>举例如下：<br>我们 springboot 依赖的redis ,并且里面有个ScheduledExecutorService 线程池 定时从队列里面读取任务执行，任务里面使用了RedisTemplate操作redis。<br>我注册了 shutdownHook 来关闭线程池，如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HookUtils.addShutdownHook(() -&gt; &#123;</span><br><span class="line">     log.info(<span class="string">&quot;ScheduledExecutorService Name[&#123;&#125;] shutdown&quot;</span>,poolName);</span><br><span class="line">     gracefulShutdown(scheduledExecutorService,<span class="number">0</span>);</span><br><span class="line">   &#125;);</span><br></pre></td></tr></table></figure>
+<p>但是，当我执行kill -15 关闭进程的时候，却在控制台发现了如下异常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">2020-02-14 18:12:47.666 [Thread-7] INFO  com.xxx.xxx.xxx.executor.master.component.task.TaskProgressManager - ScheduledExecutorService Name[xxx] shutdown finished</span><br><span class="line">2020-02-14 18:12:47.671 [Thread-7] INFO  org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService &#39;applicationTaskExecutor&#39;</span><br><span class="line">2020-02-14 18:12:47.680 [xxx] WARN  com.xxx.xxx.xxx.executor.master.component.mq.RedisMessageHandler - Read error from redis command queue</span><br><span class="line">org.springframework.data.redis.RedisSystemException: Redis exception; nested exception is io.lettuce.core.RedisException: io.lettuce.core.RedisException: Connection closed</span><br><span class="line">	at org.springframework.data.redis.connection.lettuce.LettuceExceptionConverter.convert(LettuceExceptionConverter.java:74) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.connection.lettuce.LettuceExceptionConverter.convert(LettuceExceptionConverter.java:41) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.PassThroughExceptionTranslationStrategy.translate(PassThroughExceptionTranslationStrategy.java:44) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.FallbackExceptionTranslationStrategy.translate(FallbackExceptionTranslationStrategy.java:42) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.connection.lettuce.LettuceConnection.convertLettuceAccessException(LettuceConnection.java:268) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.connection.lettuce.LettuceListCommands.convertLettuceAccessException(LettuceListCommands.java:490) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.connection.lettuce.LettuceListCommands.bRPop(LettuceListCommands.java:409) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.connection.lettuce.LettuceClusterListCommands.bRPop(LettuceClusterListCommands.java:82) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.connection.DefaultedRedisConnection.bRPop(DefaultedRedisConnection.java:535) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.core.DefaultListOperations$5.inRedis(DefaultListOperations.java:215) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.core.AbstractOperations$ValueDeserializingRedisCallback.doInRedis(AbstractOperations.java:59) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:224) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line">	at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:184) ~[spring-data-redis-2.1.5.RELEASE.jar:2.1.5.RELEASE]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这个是在执行线程池里的任务时发行redis连接已经关闭了抛出的异常。<br>所以这里需要先把线程池里的任务执行完毕在关闭redis连接，那么我们怎么控制这个顺序呢？<br>执行kill -15的时候，spring会执行一个shutdown hook 这个hook里会执行关闭动作。这个hook 在 <strong><em>AbstractApplicationContext</em></strong> 里注册</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerShutdownHook</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.shutdownHook == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="comment">// No shutdown hook registered yet.</span></span><br><span class="line">			<span class="keyword">this</span>.shutdownHook = <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">				<span class="meta">@Override</span></span><br><span class="line">				<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">					<span class="keyword">synchronized</span> (startupShutdownMonitor) &#123;</span><br><span class="line">						doClose();</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;;</span><br><span class="line">			Runtime.getRuntime().addShutdownHook(<span class="keyword">this</span>.shutdownHook);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>最终调用在 doClose 方法里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line">	 * Actually performs context closing: publishes a ContextClosedEvent and</span><br><span class="line">	 * destroys the singletons in the bean factory of this application context.</span><br><span class="line">	 * &lt;p&gt;Called by both &#123;@code close()&#125; and a JVM shutdown hook, if any.</span><br><span class="line">	 * @see org.springframework.context.event.ContextClosedEvent</span><br><span class="line">	 * @see #destroyBeans()</span><br><span class="line">	 * @see #close()</span><br><span class="line">	 * @see #registerShutdownHook()</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	protected void doClose() &#123;</span><br><span class="line">		&#x2F;&#x2F; Check whether an actual close attempt is necessary...</span><br><span class="line">		if (this.active.get() &amp;&amp; this.closed.compareAndSet(false, true)) &#123;</span><br><span class="line">			if (logger.isDebugEnabled()) &#123;</span><br><span class="line">				logger.debug(&quot;Closing &quot; + this);</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			LiveBeansView.unregisterApplicationContext(this);</span><br><span class="line"></span><br><span class="line">			try &#123;</span><br><span class="line">				&#x2F;&#x2F; Publish shutdown event.</span><br><span class="line">				publishEvent(new ContextClosedEvent(this));</span><br><span class="line">			&#125;</span><br><span class="line">			catch (Throwable ex) &#123;</span><br><span class="line">				logger.warn(&quot;Exception thrown from ApplicationListener handling ContextClosedEvent&quot;, ex);</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			&#x2F;&#x2F; Stop all Lifecycle beans, to avoid delays during individual destruction.</span><br><span class="line">			if (this.lifecycleProcessor !&#x3D; null) &#123;</span><br><span class="line">				try &#123;</span><br><span class="line">					this.lifecycleProcessor.onClose();</span><br><span class="line">				&#125;</span><br><span class="line">				catch (Throwable ex) &#123;</span><br><span class="line">					logger.warn(&quot;Exception thrown from LifecycleProcessor on context close&quot;, ex);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			&#x2F;&#x2F; Destroy all cached singletons in the context&#39;s BeanFactory.</span><br><span class="line">			destroyBeans();</span><br><span class="line"></span><br><span class="line">			&#x2F;&#x2F; Close the state of this context itself.</span><br><span class="line">			closeBeanFactory();</span><br><span class="line"></span><br><span class="line">			&#x2F;&#x2F; Let subclasses do some final clean-up if they wish...</span><br><span class="line">			onClose();</span><br><span class="line"></span><br><span class="line">			&#x2F;&#x2F; Reset local application listeners to pre-refresh state.</span><br><span class="line">			if (this.earlyApplicationListeners !&#x3D; null) &#123;</span><br><span class="line">				this.applicationListeners.clear();</span><br><span class="line">				this.applicationListeners.addAll(this.earlyApplicationListeners);</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			&#x2F;&#x2F; Switch to inactive.</span><br><span class="line">			this.active.set(false);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>doClose 会执行 </p>
+<ol>
+<li>发布cotext close event 事件通知</li>
+<li>Stop all Lifecycle beans </li>
+<li>销毁所有的单例bean(会调用bean的destory方法) </li>
+<li>关闭beanFactory</li>
+</ol>
+<p>我们知道向jvm注册的多个hook，但多个hook是并行执行的并没有先后顺序。所以要保持先后顺序必须要在一个hook里执行关闭和回收资源等操作，这样我们只能在spring hook里做了。<br>从上面看，redis 关闭资源连接等操作应该是在第三步 销毁bean里面做的，所以我们可以在第1步里监听ContextClosedEvent事件，在事件回调方法里面做，只要实现ApplicationListener<ContextClosedEvent> 接口即可 如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onApplicationEvent</span><span class="params">(<span class="keyword">final</span> ContextClosedEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// when spring closed , publish shutdown event before bean destory</span></span><br><span class="line">    log.debug(<span class="string">&quot;ApplicationContext Close Event&quot;</span>);</span><br><span class="line">    <span class="comment">//回收资源操作</span></span><br><span class="line">    componentBootstrap.close();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">spring-boot</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/02/14/springboot-graceful-shutdown/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-sprint-boot-introduction" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -899,6 +1037,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">mysql-replication</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
               </li>
             
             <div class="clearfix"></div>
