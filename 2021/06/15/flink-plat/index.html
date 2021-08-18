@@ -6,22 +6,27 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://herden.gitee.io">
-  <title>【flink源码】Flink-cdc-connector源码分析 | taox的博客|开发者驿站</title>
+  <title>实时平台对比 | taox的博客|开发者驿站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="什么是cdcCDC 的全称是 Change Data Capture ，在广义的概念上，只要能捕获数据变更的技术，我们都可以称为 CDC 。通常我们说的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。CDC 技术应用场景非常广泛：  数据同步，用于备份，容灾 数据分发，一个数据源分发给多个下游 数据采集(E)，面向数据仓库&#x2F;数据湖的 ETL 数据集成">
+  <meta name="description" content="实时平台对比美团实时平台规模 机器几千台 任务万级 数据量 1.5亿&#x2F;s  架构  最底层是收集层，这一层负责收集用户的实时数据，包括 Binlog、后端服务日志以及 IoT 数据，经过日志收集团队和 DB 收集团队的处理，数据将会被收集到 Kafka 中。这些数据不只是参与实时计算，也会参与离线计算。 收集层之上是存储层，这一层除了使用 Kafka 做消息通道之外，还会基于 HDFS 做状态数据">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【flink源码】Flink-cdc-connector源码分析">
-<meta property="og:url" content="https://herden.gitee.io/2021/08/04/flink-cdc-source-code-analysis/index.html">
+<meta property="og:title" content="实时平台对比">
+<meta property="og:url" content="https://herden.gitee.io/2021/06/15/flink-plat/index.html">
 <meta property="og:site_name" content="taox的博客|开发者驿站">
-<meta property="og:description" content="什么是cdcCDC 的全称是 Change Data Capture ，在广义的概念上，只要能捕获数据变更的技术，我们都可以称为 CDC 。通常我们说的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。CDC 技术应用场景非常广泛：  数据同步，用于备份，容灾 数据分发，一个数据源分发给多个下游 数据采集(E)，面向数据仓库&#x2F;数据湖的 ETL 数据集成">
+<meta property="og:description" content="实时平台对比美团实时平台规模 机器几千台 任务万级 数据量 1.5亿&#x2F;s  架构  最底层是收集层，这一层负责收集用户的实时数据，包括 Binlog、后端服务日志以及 IoT 数据，经过日志收集团队和 DB 收集团队的处理，数据将会被收集到 Kafka 中。这些数据不只是参与实时计算，也会参与离线计算。 收集层之上是存储层，这一层除了使用 Kafka 做消息通道之外，还会基于 HDFS 做状态数据">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-08-04T08:32:45.000Z">
-<meta property="article:modified_time" content="2021-08-16T11:33:34.001Z">
+<meta property="og:image" content="https://herden.gitee.io/20210713104502690/20210713104852925.png">
+<meta property="og:image" content="https://herden.gitee.io/20210713104502690/20210713111104589.png">
+<meta property="og:image" content="https://herden.gitee.io/20210713104502690/20210713112335156.png">
+<meta property="og:image" content="https://herden.gitee.io/20210713104502690/20210713120024934.png">
+<meta property="og:image" content="https://herden.gitee.io/flink-plat/20210713043126531.png">
+<meta property="article:published_time" content="2021-06-15T10:20:00.000Z">
+<meta property="article:modified_time" content="2021-08-18T11:20:49.043Z">
 <meta property="article:author" content="taox">
 <meta property="article:tag" content="flink">
-<meta property="article:tag" content="flink-cdc">
-<meta property="article:tag" content="binlog">
+<meta property="article:tag" content="realtime-platform">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://herden.gitee.io/20210713104502690/20210713104852925.png">
   
     <link rel="alternative" href="/atom.xml" title="taox的博客|开发者驿站" type="application/atom+xml">
   
@@ -189,98 +194,94 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-flink-cdc-source-code-analysis" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-flink-plat" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      【flink源码】Flink-cdc-connector源码分析
+      实时平台对比
     </h1>
   
 
         
-        <a href="/2021/08/04/flink-cdc-source-code-analysis/" class="archive-article-date">
-  	<time datetime="2021-08-04T08:32:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-04</time>
+        <a href="/2021/06/15/flink-plat/" class="archive-article-date">
+  	<time datetime="2021-06-15T10:20:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-06-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="什么是cdc"><a href="#什么是cdc" class="headerlink" title="什么是cdc"></a>什么是cdc</h1><p>CDC 的全称是 Change Data Capture ，在广义的概念上，只要能捕获数据变更的技术，我们都可以称为 CDC 。通常我们说的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。<br>CDC 技术应用场景非常广泛：</p>
+        <h1 id="实时平台对比"><a href="#实时平台对比" class="headerlink" title="实时平台对比"></a>实时平台对比</h1><h3 id="美团实时平台"><a href="#美团实时平台" class="headerlink" title="美团实时平台"></a>美团实时平台</h3><h4 id="规模"><a href="#规模" class="headerlink" title="规模"></a>规模</h4><ul>
+<li>机器几千台</li>
+<li>任务万级</li>
+<li>数据量 1.5亿/s</li>
+</ul>
+<h4 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h4><p><img src="/20210713104502690/20210713104852925.png"></p>
 <ul>
-<li>数据同步，用于备份，容灾</li>
-<li>数据分发，一个数据源分发给多个下游</li>
-<li>数据采集(E)，面向数据仓库/数据湖的 ETL 数据集成</li>
+<li>最底层是收集层，这一层负责收集用户的实时数据，包括 Binlog、后端服务日志以及 IoT 数据，经过日志收集团队和 DB 收集团队的处理，数据将会被收集到 Kafka 中。这些数据不只是参与实时计算，也会参与离线计算。</li>
+<li>收集层之上是存储层，这一层除了使用 Kafka 做消息通道之外，还会基于 HDFS 做状态数据存储以及基于 HBase 做维度数据的存储。</li>
+<li>存储层之上是引擎层，包括 Storm 和 Flink。实时计算平台会在引擎层为用户提供一些框架的封装以及公共包和组件的支持。</li>
+<li>在引擎层之上就是平台层了，平台层从数据、任务和资源三个视角去管理。</li>
+<li>架构的最上层是应用层，包括了实时数仓、机器学习、数据同步以及事件驱动应用等。</li>
 </ul>
 <span id="more"></span>
 
-<h1 id="常用的cdc技术实现"><a href="#常用的cdc技术实现" class="headerlink" title="常用的cdc技术实现"></a>常用的cdc技术实现</h1><p>目前业界开源的实现技术主要有，canal , debezium , maxwell 这三种 ，具体比较这里不详细解读了（参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/75357900">https://zhuanlan.zhihu.com/p/75357900</a> ）</p>
-<h1 id="Flink-cdc-connector源码分析"><a href="#Flink-cdc-connector源码分析" class="headerlink" title="Flink-cdc-connector源码分析"></a>Flink-cdc-connector源码分析</h1><p>flink-cdc-connector 使用了debezium-embeded-engine来实现从mysql获取binlog日志事件。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">debezium本来是作为一个kafka connect plugin service 来实现的，后面 debezium社区把它抽象出来了，可以独立于kafka connect 来使用</span><br></pre></td></tr></table></figure>
-<p>我们先来看一下debezium嵌入式使用demo 代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    &#x2F;&#x2F; Define the configuration for the Debezium Engine with MySQL connector...</span><br><span class="line">    final Properties props &#x3D; new Properties();</span><br><span class="line">    props.setProperty(&quot;name&quot;, &quot;my-engine&quot;);</span><br><span class="line">    props.setProperty(&quot;connector.class&quot;, &quot;io.debezium.connector.mysql.MySqlConnector&quot;);</span><br><span class="line">    props.setProperty(&quot;offset.storage&quot;, &quot;org.apache.kafka.connect.storage.FileOffsetBackingStore&quot;);</span><br><span class="line">    props.setProperty(&quot;offset.storage.file.filename&quot;,</span><br><span class="line">        &quot;&#x2F;Users&#x2F;taox&#x2F;xdf&#x2F;git&#x2F;myself&#x2F;learning&#x2F;debezium-learning&#x2F;src&#x2F;main&#x2F;resources&#x2F;offsets.dat&quot;);</span><br><span class="line">    props.setProperty(&quot;offset.flush.interval.ms&quot;, &quot;20000&quot;);</span><br><span class="line">    &#x2F;* begin connector properties *&#x2F;</span><br><span class="line">    props.setProperty(&quot;database.hostname&quot;, &quot;localhost&quot;);</span><br><span class="line">    props.setProperty(&quot;database.port&quot;, &quot;3306&quot;);</span><br><span class="line">    props.setProperty(&quot;database.user&quot;, &quot;root&quot;);</span><br><span class="line">    props.setProperty(&quot;database.password&quot;, &quot;root&quot;);</span><br><span class="line">    props.setProperty(&quot;database.server.id&quot;, &quot;857442&quot;);</span><br><span class="line">    props.setProperty(&quot;database.server.name&quot;, &quot;my-app-connector2&quot;);</span><br><span class="line">    props.setProperty(&quot;snapshot.mode&quot;, &quot;schema_only&quot;);</span><br><span class="line">    props.setProperty(&quot;database.include.list&quot;, &quot;flink_sql&quot;);</span><br><span class="line">    props.setProperty(&quot;table.include.list&quot;, &quot;flink_sql.orders&quot;);</span><br><span class="line">    props.setProperty(&quot;database.history&quot;,</span><br><span class="line">        &quot;io.debezium.relational.history.FileDatabaseHistory&quot;);</span><br><span class="line">    props.setProperty(&quot;database.history.file.filename&quot;,</span><br><span class="line">        &quot;&#x2F;Users&#x2F;taox&#x2F;xdf&#x2F;git&#x2F;myself&#x2F;learning&#x2F;debezium-learning&#x2F;src&#x2F;main&#x2F;resources&#x2F;dbhistory.dat&quot;);</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; Create the engine with this configuration ...</span><br><span class="line">    try &#123;</span><br><span class="line">        DebeziumEngine&lt;ChangeEvent&lt;String, String&gt;&gt; engine &#x3D; DebeziumEngine.create(Json.class)</span><br><span class="line">          .using(props)</span><br><span class="line">          .notifying(record -&gt; &#123;</span><br><span class="line">            System.out.println(&quot;key: &quot; + record.key());</span><br><span class="line">            System.out.println(&quot;value: &quot; + record.value());</span><br><span class="line">          &#125;).using((success, message, error) -&gt; &#123;</span><br><span class="line">            System.out.println(&quot;complete:&quot; + message);</span><br><span class="line">            if (error !&#x3D; null) &#123;</span><br><span class="line">              ExceptionUtils.rethrow(error);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;).build();</span><br><span class="line"></span><br><span class="line">      &#x2F;&#x2F; Run the engine asynchronously ...</span><br><span class="line">      ExecutorService executor &#x3D; Executors.newSingleThreadExecutor(new ThreadFactory() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public Thread newThread(Runnable r) &#123;</span><br><span class="line">          Thread thread &#x3D; new Thread(r);</span><br><span class="line">          thread.setDaemon(false);</span><br><span class="line">          return thread;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">      executor.execute(engine);</span><br><span class="line">      &#x2F;&#x2F; Do something else or wait for a signal or an event</span><br><span class="line">      System.out.println(&quot;end&quot;);</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F; Engine is stopped when the main code is finished</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>使用 DebeziumEngine.create 方法构建 DebeziumEngine 对象。 用标准的**<em>Properties**</em>对象传入配置属性，其中重要的属性如下：</p>
-<ul>
-<li>connector.class： 连接器类，如MysqlConnector</li>
-<li>offset.storage：binlog position存储实现类<blockquote>
-<p>需要把binlog position保存起来，以便程序挂掉后重启还可以接着从保存的位点开始消费</p>
-</blockquote>
-</li>
-<li>database.history：主库历史schemea存储实现类<blockquote>
-<p>这里需要记录mysql库表的schema信息，以便恢复数据和扩充信息（因为binlog里并不包含字段信息）</p>
-</blockquote>
-</li>
-<li>database.* ：mysql master 相关信息<br>最后使用ExecutorService来启动，当接受到binlog的insert,update,delete事件后 通过 notifying 回调通知，业务处理代码主要在这个地方完成。</li>
+<h3 id="业务场景"><a href="#业务场景" class="headerlink" title="业务场景"></a>业务场景</h3><ul>
+<li>流量数仓 </li>
+<li>业务数仓</li>
+<li>特征数仓</li>
 </ul>
-<p>flink-cdc-connector中使用<br>我们下来看一下在flink datastream 中用法，代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) throws Exception &#123;</span><br><span class="line">    SourceFunction&lt;String&gt; sourceFunction &#x3D; MySQLSource.&lt;String&gt;builder()</span><br><span class="line">        .hostname(&quot;localhost&quot;)</span><br><span class="line">        .port(3306)</span><br><span class="line">        .databaseList(&quot;flink_sql&quot;) &#x2F;&#x2F; monitor all tables under inventory database</span><br><span class="line">        .username(&quot;root&quot;)</span><br><span class="line">        .password(&quot;root&quot;)</span><br><span class="line">        .tableList(&quot;flink_sql.orders&quot;)</span><br><span class="line">        .startupOptions(StartupOptions.latest())</span><br><span class="line">        .deserializer(new StringDebeziumDeserializationSchema()) &#x2F;&#x2F; converts SourceRecord to String</span><br><span class="line">        .build();</span><br><span class="line"></span><br><span class="line">    StreamExecutionEnvironment env &#x3D; StreamExecutionEnvironment.getExecutionEnvironment();</span><br><span class="line">    env</span><br><span class="line">        .addSource(sourceFunction)</span><br><span class="line">        .print().setParallelism(1); &#x2F;&#x2F; use parallelism 1 for sink to keep message ordering</span><br><span class="line">    env.execute();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<p>通过MySQLSource.build 来构建一个flink SourceFunction <strong>* DebeziumSourceFunction*</strong> , 我们来看一下实现：<br>这个类的继承结构如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public class DebeziumSourceFunction&lt;T&gt; extends RichSourceFunction&lt;T&gt;</span><br><span class="line">        implements CheckpointedFunction, CheckpointListener, ResultTypeQueryable&lt;T&gt; </span><br></pre></td></tr></table></figure>
-<p>该算子实现了 CheckpointedFunction，CheckpointListener来做状态存储（主要是存储offsets,databasehistory)。<br>在看一下 run 方法，通过 DebeziumEngine.build来创建DebeziumEngine，并启动</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">public void run(SourceContext&lt;T&gt; sourceContext) throws Exception &#123;</span><br><span class="line">        properties.setProperty(&quot;name&quot;, &quot;engine&quot;);</span><br><span class="line">        properties.setProperty(&quot;offset.storage&quot;, FlinkOffsetBackingStore.class.getCanonicalName());</span><br><span class="line">        if (restoredOffsetState !&#x3D; null) &#123;</span><br><span class="line">            &#x2F;&#x2F; restored from state</span><br><span class="line">            properties.setProperty(FlinkOffsetBackingStore.OFFSET_STATE_VALUE, restoredOffsetState);</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F; DO NOT include schema payload in change event</span><br><span class="line">        properties.setProperty(&quot;key.converter.schemas.enable&quot;, &quot;false&quot;);</span><br><span class="line">        properties.setProperty(&quot;value.converter.schemas.enable&quot;, &quot;false&quot;);</span><br><span class="line">        &#x2F;&#x2F; DO NOT include schema change, e.g. DDL</span><br><span class="line">        properties.setProperty(&quot;include.schema.changes&quot;, &quot;false&quot;);</span><br><span class="line">        &#x2F;&#x2F; disable the offset flush totally</span><br><span class="line">        properties.setProperty(&quot;offset.flush.interval.ms&quot;, String.valueOf(Long.MAX_VALUE));</span><br><span class="line">        &#x2F;&#x2F; disable tombstones</span><br><span class="line">        properties.setProperty(&quot;tombstones.on.delete&quot;, &quot;false&quot;);</span><br><span class="line">        &#x2F;&#x2F; we have to use a persisted DatabaseHistory implementation, otherwise, recovery can&#39;t</span><br><span class="line">        &#x2F;&#x2F; continue to read binlog</span><br><span class="line">        &#x2F;&#x2F; see</span><br><span class="line">        &#x2F;&#x2F; https:&#x2F;&#x2F;stackoverflow.com&#x2F;questions&#x2F;57147584&#x2F;debezium-error-schema-isnt-know-to-this-connector</span><br><span class="line">        &#x2F;&#x2F; and https:&#x2F;&#x2F;debezium.io&#x2F;blog&#x2F;2018&#x2F;03&#x2F;16&#x2F;note-on-database-history-topic-configuration&#x2F;</span><br><span class="line">        properties.setProperty(&quot;database.history&quot;, FlinkDatabaseHistory.class.getCanonicalName());</span><br><span class="line">        if (engineInstanceName &#x3D;&#x3D; null) &#123;</span><br><span class="line">            &#x2F;&#x2F; not restore from recovery</span><br><span class="line">            engineInstanceName &#x3D; UUID.randomUUID().toString();</span><br><span class="line">            FlinkDatabaseHistory.registerEmptyHistoryRecord(engineInstanceName);</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F; history instance name to initialize FlinkDatabaseHistory</span><br><span class="line">        properties.setProperty(</span><br><span class="line">                FlinkDatabaseHistory.DATABASE_HISTORY_INSTANCE_NAME, engineInstanceName);</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; we have to filter out the heartbeat events, otherwise the deserializer will fail</span><br><span class="line">        String dbzHeartbeatPrefix &#x3D;</span><br><span class="line">                properties.getProperty(</span><br><span class="line">                        Heartbeat.HEARTBEAT_TOPICS_PREFIX.name(),</span><br><span class="line">                        Heartbeat.HEARTBEAT_TOPICS_PREFIX.defaultValueAsString());</span><br><span class="line">        this.debeziumConsumer &#x3D;</span><br><span class="line">                new DebeziumChangeConsumer&lt;&gt;(</span><br><span class="line">                        sourceContext,</span><br><span class="line">                        deserializer,</span><br><span class="line">                        restoredOffsetState &#x3D;&#x3D; null, &#x2F;&#x2F; DB snapshot phase if restore state is null</span><br><span class="line">                        this::reportError,</span><br><span class="line">                        dbzHeartbeatPrefix);</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; create the engine with this configuration ...</span><br><span class="line">        this.engine &#x3D;</span><br><span class="line">                DebeziumEngine.create(Connect.class)</span><br><span class="line">                        .using(properties)</span><br><span class="line">                        .notifying(debeziumConsumer)</span><br><span class="line">                        .using(OffsetCommitPolicy.always())</span><br><span class="line">                        .using(</span><br><span class="line">                                (success, message, error) -&gt; &#123;</span><br><span class="line">                                    if (!success &amp;&amp; error !&#x3D; null) &#123;</span><br><span class="line">                                        this.reportError(error);</span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125;)</span><br><span class="line">                        .build();</span><br><span class="line"></span><br><span class="line">        if (!running) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; run the engine asynchronously</span><br><span class="line">        executor.execute(engine);</span><br><span class="line">        debeziumStarted &#x3D; true;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; initialize metrics</span><br><span class="line">        MetricGroup metricGroup &#x3D; getRuntimeContext().getMetricGroup();</span><br><span class="line">        metricGroup.gauge(</span><br><span class="line">                &quot;currentFetchEventTimeLag&quot;, (Gauge&lt;Long&gt;) () -&gt; debeziumConsumer.getFetchDelay());</span><br><span class="line">        metricGroup.gauge(</span><br><span class="line">                &quot;currentEmitEventTimeLag&quot;, (Gauge&lt;Long&gt;) () -&gt; debeziumConsumer.getEmitDelay());</span><br><span class="line">        metricGroup.gauge(&quot;sourceIdleTime&quot;, (Gauge&lt;Long&gt;) () -&gt; debeziumConsumer.getIdleTime());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; on a clean exit, wait for the runner thread</span><br><span class="line">        try &#123;</span><br><span class="line">            while (running) &#123;</span><br><span class="line">                if (executor.awaitTermination(5, TimeUnit.SECONDS)) &#123;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">                if (error !&#x3D; null) &#123;</span><br><span class="line">                    running &#x3D; false;</span><br><span class="line">                    shutdownEngine();</span><br><span class="line">                    &#x2F;&#x2F; rethrow the error from Debezium consumer</span><br><span class="line">                    ExceptionUtils.rethrow(error);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            &#x2F;&#x2F; may be the result of a wake-up interruption after an exception.</span><br><span class="line">            &#x2F;&#x2F; we ignore this here and only restore the interruption state</span><br><span class="line">            Thread.currentThread().interrupt();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>其中，offset.storage 使用了*<strong>FlinkOffsetBackingStore*** 类来实现 position的持久化。database.history 使用了*</strong>FlinkDatabaseHistory***类来存储历史schema信息。</p>
-<p>我们先来看一下 FlinkOffsetBackingStore 这个类的主要作用是存储和获取offset，这里并不直接和flink的state storeage打交道，看一下类注释</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A implementation of OffsetBackingStore backed on Flink&#39;s state mechanism.</span><br><span class="line">The OFFSET_STATE_VALUE in the WorkerConfig is the raw position and offset data in JSON format. It is set into the config when recovery from failover by DebeziumSourceFunction before startup the DebeziumEngine. If it is not a restoration, the OFFSET_STATE_VALUE is empty. DebeziumEngine relies on the OffsetBackingStore for failover recovery.</span><br></pre></td></tr></table></figure>
-<p>注意其中的 OFFSET_STATE_VALUE 变量，这个在任务失败恢复的时候会通过 DebeziumEngine 配置来初始化值，这个值从flink state 里设置。<br>而真正做offset状态持久化存储的是在 DebeziumSourceFunction类的 snapshotState 方法里 ，这里会继续调用 snapshotOffsetState 方法，看一下代码，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">private void snapshotOffsetState(long checkpointId) throws Exception &#123;</span><br><span class="line">        offsetState.clear();</span><br><span class="line"></span><br><span class="line">        final DebeziumChangeConsumer&lt;?&gt; consumer &#x3D; this.debeziumConsumer;</span><br><span class="line"></span><br><span class="line">        byte[] serializedOffset &#x3D; null;</span><br><span class="line">        if (consumer &#x3D;&#x3D; null) &#123;</span><br><span class="line">            &#x2F;&#x2F; the consumer has not yet been initialized, which means we need to return the</span><br><span class="line">            &#x2F;&#x2F; originally restored offsets</span><br><span class="line">            if (restoredOffsetState !&#x3D; null) &#123;</span><br><span class="line">                serializedOffset &#x3D; restoredOffsetState.getBytes(StandardCharsets.UTF_8);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            byte[] currentState &#x3D; consumer.snapshotCurrentState();</span><br><span class="line">            if (currentState &#x3D;&#x3D; null &amp;&amp; restoredOffsetState !&#x3D; null) &#123;</span><br><span class="line">                &#x2F;&#x2F; the consumer has been initialized, but has not yet received any data,</span><br><span class="line">                &#x2F;&#x2F; which means we need to return the originally restored offsets</span><br><span class="line">                serializedOffset &#x3D; restoredOffsetState.getBytes(StandardCharsets.UTF_8);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                serializedOffset &#x3D; currentState;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (serializedOffset !&#x3D; null) &#123;</span><br><span class="line">            offsetState.add(serializedOffset);</span><br><span class="line">            &#x2F;&#x2F; the map cannot be asynchronously updated, because only one checkpoint call</span><br><span class="line">            &#x2F;&#x2F; can happen on this function at a time: either snapshotState() or</span><br><span class="line">            &#x2F;&#x2F; notifyCheckpointComplete()</span><br><span class="line">            pendingOffsetsToCommit.put(checkpointId, serializedOffset);</span><br><span class="line">            &#x2F;&#x2F; truncate the map of pending offsets to commit, to prevent infinite growth</span><br><span class="line">            while (pendingOffsetsToCommit.size() &gt; MAX_NUM_PENDING_CHECKPOINTS) &#123;</span><br><span class="line">                pendingOffsetsToCommit.remove(0);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>里面用到里 offsetState 这个 ListState&lt;byte[]&gt; 来存储offset , 它的值通过 consumer.snapshotCurrentState(); 这个方法来获取 ，看一下方法实现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public byte[] snapshotCurrentState() throws Exception &#123;</span><br><span class="line">        &#x2F;&#x2F; this method assumes that the checkpoint lock is held</span><br><span class="line">        assert Thread.holdsLock(checkpointLock);</span><br><span class="line">        if (debeziumOffset.sourceOffset &#x3D;&#x3D; null || debeziumOffset.sourcePartition &#x3D;&#x3D; null) &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return stateSerializer.serialize(debeziumOffset);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>offset的值就在 debeziumOffset 变量里，这个变量的值回在DebeziumChangeConsumer.handleBatch 里进行更新 ，当每来一个crud 事件的时候，就回调用这个方法，这个方法最终回调用 emitRecordsUnderCheckpointLock 这个进行 event向下游发送并更新debeziumOffset 变量的值。</p>
+<h3 id="实时数仓建设方式"><a href="#实时数仓建设方式" class="headerlink" title="实时数仓建设方式"></a>实时数仓建设方式</h3><ul>
+<li><p>准实时数仓</p>
+</li>
+<li><p>实时数仓 </p>
 <blockquote>
-<p>注意：<br>这里会使用同步checkpointLock（这个锁的作用见后面分析），emit the records, using the checkpoint lock to guarantee atomicity of record emission and offset state update<br>。 </p>
-</blockquote>
-<p>做完以上步骤后，offsetState就会通过checkpoint机制持久化了。最后一步是通过 notifyCheckpointComplete() 回调方法，来把已经checkpoint的offsetState值，写回 debezium FlinkOffsetBackingStore 存储里，实际调用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">DebeziumOffset offset &#x3D;</span><br><span class="line">                    DebeziumOffsetSerializer.INSTANCE.deserialize(serializedOffsets);</span><br><span class="line">            consumer.commitOffset(offset);</span><br></pre></td></tr></table></figure>
-<p>最终回调用：FlinkOffsetBackingStore.set 方法。到此 offset 状态持久化存储流程就走完了。<br>再来看一下状态恢复流程，调用 DebeziumSourceFunction.initializeState  方法，context.isRestored() 返回true , 通过 offsetState 获取到状态值，赋值给 restoredOffsetState 变量，最后在 run 方法里会把这个变量值设置给<br><strong><em>properties.setProperty(FlinkOffsetBackingStore.OFFSET_STATE_VALUE, restoredOffsetState);</em></strong>  debezium 启动时，会初始化 FlinkOffsetBackingStore 调用它的 configure 方法，完成offset 初始化。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">    public void initializeState(FunctionInitializationContext context) throws Exception &#123;</span><br><span class="line">        OperatorStateStore stateStore &#x3D; context.getOperatorStateStore();</span><br><span class="line">        this.offsetState &#x3D;</span><br><span class="line">                stateStore.getUnionListState(</span><br><span class="line">                        new ListStateDescriptor&lt;&gt;(</span><br><span class="line">                                OFFSETS_STATE_NAME,</span><br><span class="line">                                PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO));</span><br><span class="line">        this.historyRecordsState &#x3D;</span><br><span class="line">                stateStore.getUnionListState(</span><br><span class="line">                        new ListStateDescriptor&lt;&gt;(</span><br><span class="line">                                HISTORY_RECORDS_STATE_NAME, BasicTypeInfo.STRING_TYPE_INFO));</span><br><span class="line"></span><br><span class="line">        if (context.isRestored()) &#123;</span><br><span class="line">            restoreOffsetState();</span><br><span class="line">            restoreHistoryRecordsState();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            if (specificOffset !&#x3D; null) &#123;</span><br><span class="line">                byte[] serializedOffset &#x3D;</span><br><span class="line">                        DebeziumOffsetSerializer.INSTANCE.serialize(specificOffset);</span><br><span class="line">                restoredOffsetState &#x3D; new String(serializedOffset, StandardCharsets.UTF_8);</span><br><span class="line">                LOG.info(</span><br><span class="line">                        &quot;Consumer subtask &#123;&#125; starts to read from specified offset &#123;&#125;.&quot;,</span><br><span class="line">                        getRuntimeContext().getIndexOfThisSubtask(),</span><br><span class="line">                        restoredOffsetState);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                LOG.info(</span><br><span class="line">                        &quot;Consumer subtask &#123;&#125; has no restore state.&quot;,</span><br><span class="line">                        getRuntimeContext().getIndexOfThisSubtask());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>以上完成了，flink-cdc-connector 启动，offset存储和恢复源码分析，对于 FlinkDatabaseHistory 大致原理差不多，读者可以自行阅读源码。</p>
-<h3 id="checkpointLock-锁"><a href="#checkpointLock-锁" class="headerlink" title="checkpointLock 锁"></a>checkpointLock 锁</h3><p>在1.x版本里 如果在snapshot阶段的时候，是不能进行checkpoint的。因为，snapshot阶段并没有支持断点(增量)读取数据。<br>代码实现如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">if (isInDbSnapshotPhase) &#123;</span><br><span class="line">    if (!lockHold) &#123;</span><br><span class="line">        MemoryUtils.UNSAFE.monitorEnter(checkpointLock);</span><br><span class="line">        lockHold &#x3D; true;</span><br><span class="line">        LOG.info(</span><br><span class="line">                &quot;Database snapshot phase can&#39;t perform checkpoint, acquired Checkpoint lock.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    if (!isSnapshotRecord(record)) &#123;</span><br><span class="line">        MemoryUtils.UNSAFE.monitorExit(checkpointLock);</span><br><span class="line">        isInDbSnapshotPhase &#x3D; false;</span><br><span class="line">        LOG.info(</span><br><span class="line">                &quot;Received record from streaming binlog phase, released checkpoint lock.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>最后总结一下flink-cdc-connector的一些特性，参考github文档里总结</p>
-<ul>
-<li><p>Exactly-Once Processing (可以实现精确一致的处理)</p>
-<blockquote>
-<p>The MySQL CDC connector is a Flink Source connector which will read database snapshot first and then continues to read binlogs with exactly-once processing even failures happen. Please read How the connector performs database snapshot.</p>
+<p>实时数仓的两种建设方式，即准实时数仓和实时数仓两种方式进行了对比。它们的实现方式分别是基于 OLAP 引擎和流计算引擎，实时度则分别是分钟和秒级。</p>
 </blockquote>
 </li>
-<li><p>Startup Reading Position （可以从指定位点消费binlog）</p>
-<blockquote>
-<p>The config option scan.startup.mode specifies the startup mode for MySQL CDC consumer.</p>
-</blockquote>
+<li><p>在调度开销方面，准实时数仓是批处理过程，因此仍然需要调度系统支持，虽然调度开销比离线数仓少一些，但是依然存在，而实时数仓却没有调度开销。</p>
 </li>
-<li><p>Single Thread Reading （只能是一个并行度处理）</p>
-<blockquote>
-<p>The MySQL CDC source can’t work in parallel reading, because there is only one task can receive binlog events.</p>
-</blockquote>
+<li><p>在业务灵活性方面，因为准实时数仓基于 OLAP 引擎实现，灵活性优于基于流计算的方式。</p>
 </li>
-<li><p>Supports reading database snapshot and continues to read binlogs(支持做初始化快照，但初始化快照需要对数据库加锁)</p>
+<li><p>在对数据晚到的容忍度方面，因为准实时数仓可以基于一个周期内的数据进行全量计算，因此对于数据晚到的容忍度也是比较高的，而实时数仓使用的是增量计算，对于数据晚到的容忍度更低一些。</p>
+</li>
+<li><p>在扩展性方面，因为准实时数仓的计算和存储是一体的，因此相比于实时数仓，扩展性更弱一些。</p>
+</li>
+<li><p>在适用场景方面，准实时数仓主要用于有实时性要求但不太高、数据量不大以及多表关联复杂和业务变更频繁的场景，如交易类型的实时分析，实时数仓则更适用于实时性要求高、数据量大的场景，如实时特征、流量分发以及流量类型实时分析。</p>
 </li>
 </ul>
-<p>目前社区正在进行flink cdc 2.0的开发，来解决单并行度和数据库加锁的问题<br>参考：<a target="_blank" rel="noopener" href="https://github.com/ververica/flink-cdc-connectors/pull/233">https://github.com/ververica/flink-cdc-connectors/pull/233</a> </p>
+<p><img src="/20210713104502690/20210713111104589.png"></p>
+<p>总结： </p>
+<ul>
+<li>根据业务场景不同选择不同的架构方式，没有一种架构是包治百病的</li>
+</ul>
+<h3 id="一站式解决方案-实时开发平台"><a href="#一站式解决方案-实时开发平台" class="headerlink" title="一站式解决方案-实时开发平台"></a>一站式解决方案-实时开发平台</h3><p><img src="/20210713104502690/20210713112335156.png"></p>
+<ul>
+<li>引擎层<blockquote>
+<p>flink connector 扩展和集成</p>
+</blockquote>
+</li>
+<li>SQL层：<blockquote>
+<p>统一sql解析，校验 </p>
+</blockquote>
+</li>
+<li>平台层<blockquote>
+<p>sql ide 支持，udf管理，olap平台 ，元数据</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="好未来实时开发平台"><a href="#好未来实时开发平台" class="headerlink" title="好未来实时开发平台"></a>好未来实时开发平台</h3><p><img src="/20210713104502690/20210713120024934.png"></p>
+<ul>
+<li><strong>数据集成</strong> 方面，我们支持数据库、埋点数据、服务端日志数据的集成，为了能够提高数据集成的效率，我们提供了很多的通用模板作业，用户只需要配置即可快速实现数据的集成。</li>
+<li><strong>数据开发</strong> 方面，我们支持两种方式的作业开发，一种是 Flink SQL 作业开发、一种是 Flink Jar 包托管，在 Flink SQL 开发上我们内置了很多 UDF 函数，比如可以通过 UDF 函数实现维表 join，也支持用户自定义 UDF，并且实现了 UDF 的热加载。除此之外，我们也会记录用户在作业开发过程中的元数据信息，方便血缘系统的建设。</li>
+<li><strong>作业保障</strong> 方面，我们支持作业状态监控、异常告警、作业失败之后的自动拉起，作业自动拉起我们会自动选择可用的 checkpoint 版本进行拉起，同时也支持作业在多集群之间的切换。</li>
+<li><strong>资源管理</strong> 方面，我们支持平台多租户，每个租户使用 namespace 进行隔离、实现了不同事业部、不同用户、不同版本的 Flink 客户端隔离、实现了计算资源的隔离。</li>
+<li><strong>数据安全</strong> 方面，我们支持角色权限管理、表级别权限管理、操作审计日志查询等功能。</li>
+</ul>
+<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><p><img src="/flink-plat/20210713043126531.png"></p>
 
       
 
@@ -329,11 +330,7 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">flink-cdc</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">binlog</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">realtime-platform</a>
         		</li>
       		
 		</ul>
@@ -389,7 +386,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=https://herden.gitee.io/2021/08/04/flink-cdc-source-code-analysis/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=https://herden.gitee.io/2021/06/15/flink-plat/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -403,18 +400,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2021/08/12/mysql-binlog-replication-protocol/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2021/07/24/flink-cdc-source-code-analysis/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          详解mysql binlog 复制协议
+          【flink源码】Flink-cdc-connector源码分析
         
       </div>
     </a>
   
   
-    <a href="/2021/07/13/flink-plat/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title"></div>
+    <a href="/2021/02/25/flink-client-source-analysis/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">【flink源码】从Flink client 提交源码看第三方jar包的动态加载的解决方案</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -441,7 +438,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFcdc"><span class="toc-number">1.</span> <span class="toc-text">什么是cdc</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84cdc%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">常用的cdc技术实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Flink-cdc-connector%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">3.</span> <span class="toc-text">Flink-cdc-connector源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#checkpointLock-%E9%94%81"><span class="toc-number">3.0.1.</span> <span class="toc-text">checkpointLock 锁</span></a></li></ol></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E6%97%B6%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%AF%94"><span class="toc-number">1.</span> <span class="toc-text">实时平台对比</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BE%8E%E5%9B%A2%E5%AE%9E%E6%97%B6%E5%B9%B3%E5%8F%B0"><span class="toc-number">1.0.1.</span> <span class="toc-text">美团实时平台</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%84%E6%A8%A1"><span class="toc-number">1.0.1.1.</span> <span class="toc-text">规模</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84"><span class="toc-number">1.0.1.2.</span> <span class="toc-text">架构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF"><span class="toc-number">1.0.2.</span> <span class="toc-text">业务场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E5%BB%BA%E8%AE%BE%E6%96%B9%E5%BC%8F"><span class="toc-number">1.0.3.</span> <span class="toc-text">实时数仓建设方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E7%AB%99%E5%BC%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88-%E5%AE%9E%E6%97%B6%E5%BC%80%E5%8F%91%E5%B9%B3%E5%8F%B0"><span class="toc-number">1.0.4.</span> <span class="toc-text">一站式解决方案-实时开发平台</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%BD%E6%9C%AA%E6%9D%A5%E5%AE%9E%E6%97%B6%E5%BC%80%E5%8F%91%E5%B9%B3%E5%8F%B0"><span class="toc-number">1.0.5.</span> <span class="toc-text">好未来实时开发平台</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94"><span class="toc-number">1.0.6.</span> <span class="toc-text">对比</span></a></li></ol></li></ol></li></ol>
                     </div>
                 </span>
             </div>
@@ -662,6 +659,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
               </li>
             
             <div class="clearfix"></div>

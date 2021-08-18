@@ -6,26 +6,16 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://herden.gitee.io">
-  <title>taox的博客|开发者驿站</title>
+  <title>Archives: 2021/6 | taox的博客|开发者驿站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="实时平台对比美团实时平台规模 机器几千台 任务万级 数据量 1.5亿&#x2F;s  架构  最底层是收集层，这一层负责收集用户的实时数据，包括 Binlog、后端服务日志以及 IoT 数据，经过日志收集团队和 DB 收集团队的处理，数据将会被收集到 Kafka 中。这些数据不只是参与实时计算，也会参与离线计算。 收集层之上是存储层，这一层除了使用 Kafka 做消息通道之外，还会基于 HDFS 做状态数据">
-<meta property="og:type" content="article">
+  <meta property="og:type" content="website">
 <meta property="og:title" content="taox的博客|开发者驿站">
-<meta property="og:url" content="https://herden.gitee.io/2021/07/13/flink-plat/index.html">
+<meta property="og:url" content="https://herden.gitee.io/archives/2021/06/index.html">
 <meta property="og:site_name" content="taox的博客|开发者驿站">
-<meta property="og:description" content="实时平台对比美团实时平台规模 机器几千台 任务万级 数据量 1.5亿&#x2F;s  架构  最底层是收集层，这一层负责收集用户的实时数据，包括 Binlog、后端服务日志以及 IoT 数据，经过日志收集团队和 DB 收集团队的处理，数据将会被收集到 Kafka 中。这些数据不只是参与实时计算，也会参与离线计算。 收集层之上是存储层，这一层除了使用 Kafka 做消息通道之外，还会基于 HDFS 做状态数据">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://herden.gitee.io/20210713104502690/20210713104852925.png">
-<meta property="og:image" content="https://herden.gitee.io/20210713104502690/20210713111104589.png">
-<meta property="og:image" content="https://herden.gitee.io/20210713104502690/20210713112335156.png">
-<meta property="og:image" content="https://herden.gitee.io/20210713104502690/20210713120024934.png">
-<meta property="og:image" content="https://herden.gitee.io/flink-plat/20210713043126531.png">
-<meta property="article:published_time" content="2021-07-13T07:43:46.297Z">
-<meta property="article:modified_time" content="2021-08-16T11:37:23.869Z">
 <meta property="article:author" content="taox">
 <meta property="article:tag" content="java spring spring-cloud hbase bigdata flink">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://herden.gitee.io/20210713104502690/20210713104852925.png">
   
     <link rel="alternative" href="/atom.xml" title="taox的博客|开发者驿站" type="application/atom+xml">
   
@@ -193,240 +183,64 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-flink-plat" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
+            
+  
+  
     
-    <div class="article-entry" itemprop="articleBody">
+    
       
-        <h1 id="实时平台对比"><a href="#实时平台对比" class="headerlink" title="实时平台对比"></a>实时平台对比</h1><h3 id="美团实时平台"><a href="#美团实时平台" class="headerlink" title="美团实时平台"></a>美团实时平台</h3><h4 id="规模"><a href="#规模" class="headerlink" title="规模"></a>规模</h4><ul>
-<li>机器几千台</li>
-<li>任务万级</li>
-<li>数据量 1.5亿/s</li>
-</ul>
-<h4 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h4><p><img src="/20210713104502690/20210713104852925.png"></p>
-<ul>
-<li>最底层是收集层，这一层负责收集用户的实时数据，包括 Binlog、后端服务日志以及 IoT 数据，经过日志收集团队和 DB 收集团队的处理，数据将会被收集到 Kafka 中。这些数据不只是参与实时计算，也会参与离线计算。</li>
-<li>收集层之上是存储层，这一层除了使用 Kafka 做消息通道之外，还会基于 HDFS 做状态数据存储以及基于 HBase 做维度数据的存储。</li>
-<li>存储层之上是引擎层，包括 Storm 和 Flink。实时计算平台会在引擎层为用户提供一些框架的封装以及公共包和组件的支持。</li>
-<li>在引擎层之上就是平台层了，平台层从数据、任务和资源三个视角去管理。</li>
-<li>架构的最上层是应用层，包括了实时数仓、机器学习、数据同步以及事件驱动应用等。</li>
-</ul>
-<span id="more"></span>
-
-<h3 id="业务场景"><a href="#业务场景" class="headerlink" title="业务场景"></a>业务场景</h3><ul>
-<li>流量数仓 </li>
-<li>业务数仓</li>
-<li>特征数仓</li>
-</ul>
-<h3 id="实时数仓建设方式"><a href="#实时数仓建设方式" class="headerlink" title="实时数仓建设方式"></a>实时数仓建设方式</h3><ul>
-<li><p>准实时数仓</p>
-</li>
-<li><p>实时数仓 </p>
-<blockquote>
-<p>实时数仓的两种建设方式，即准实时数仓和实时数仓两种方式进行了对比。它们的实现方式分别是基于 OLAP 引擎和流计算引擎，实时度则分别是分钟和秒级。</p>
-</blockquote>
-</li>
-<li><p>在调度开销方面，准实时数仓是批处理过程，因此仍然需要调度系统支持，虽然调度开销比离线数仓少一些，但是依然存在，而实时数仓却没有调度开销。</p>
-</li>
-<li><p>在业务灵活性方面，因为准实时数仓基于 OLAP 引擎实现，灵活性优于基于流计算的方式。</p>
-</li>
-<li><p>在对数据晚到的容忍度方面，因为准实时数仓可以基于一个周期内的数据进行全量计算，因此对于数据晚到的容忍度也是比较高的，而实时数仓使用的是增量计算，对于数据晚到的容忍度更低一些。</p>
-</li>
-<li><p>在扩展性方面，因为准实时数仓的计算和存储是一体的，因此相比于实时数仓，扩展性更弱一些。</p>
-</li>
-<li><p>在适用场景方面，准实时数仓主要用于有实时性要求但不太高、数据量不大以及多表关联复杂和业务变更频繁的场景，如交易类型的实时分析，实时数仓则更适用于实时性要求高、数据量大的场景，如实时特征、流量分发以及流量类型实时分析。</p>
-</li>
-</ul>
-<p><img src="/20210713104502690/20210713111104589.png"></p>
-<p>总结： </p>
-<ul>
-<li>根据业务场景不同选择不同的架构方式，没有一种架构是包治百病的</li>
-</ul>
-<h3 id="一站式解决方案-实时开发平台"><a href="#一站式解决方案-实时开发平台" class="headerlink" title="一站式解决方案-实时开发平台"></a>一站式解决方案-实时开发平台</h3><p><img src="/20210713104502690/20210713112335156.png"></p>
-<ul>
-<li>引擎层<blockquote>
-<p>flink connector 扩展和集成</p>
-</blockquote>
-</li>
-<li>SQL层：<blockquote>
-<p>统一sql解析，校验 </p>
-</blockquote>
-</li>
-<li>平台层<blockquote>
-<p>sql ide 支持，udf管理，olap平台 ，元数据</p>
-</blockquote>
-</li>
-</ul>
-<h3 id="好未来实时开发平台"><a href="#好未来实时开发平台" class="headerlink" title="好未来实时开发平台"></a>好未来实时开发平台</h3><p><img src="/20210713104502690/20210713120024934.png"></p>
-<ul>
-<li><strong>数据集成</strong> 方面，我们支持数据库、埋点数据、服务端日志数据的集成，为了能够提高数据集成的效率，我们提供了很多的通用模板作业，用户只需要配置即可快速实现数据的集成。</li>
-<li><strong>数据开发</strong> 方面，我们支持两种方式的作业开发，一种是 Flink SQL 作业开发、一种是 Flink Jar 包托管，在 Flink SQL 开发上我们内置了很多 UDF 函数，比如可以通过 UDF 函数实现维表 join，也支持用户自定义 UDF，并且实现了 UDF 的热加载。除此之外，我们也会记录用户在作业开发过程中的元数据信息，方便血缘系统的建设。</li>
-<li><strong>作业保障</strong> 方面，我们支持作业状态监控、异常告警、作业失败之后的自动拉起，作业自动拉起我们会自动选择可用的 checkpoint 版本进行拉起，同时也支持作业在多集群之间的切换。</li>
-<li><strong>资源管理</strong> 方面，我们支持平台多租户，每个租户使用 namespace 进行隔离、实现了不同事业部、不同用户、不同版本的 Flink 客户端隔离、实现了计算资源的隔离。</li>
-<li><strong>数据安全</strong> 方面，我们支持角色权限管理、表级别权限管理、操作审计日志查询等功能。</li>
-</ul>
-<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><p><img src="/flink-plat/20210713043126531.png"></p>
-
       
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你支持我养家糊口！<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="/img/zhifubaopay.jpeg">
-                      <span class="reward-type">支付宝</span>
-                    </div>
-                    
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="/img/weixinpay.jpeg">
-                      <span class="reward-type">微信</span>
-                    </div>
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2021" class="archive-year">2021</a>
         </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2021/06/15/flink-plat/" class="archive-article-date">
+  	<time datetime="2021-06-15T10:20:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-06-15</time>
+</a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2021/06/15/flink-plat/">实时平台对比</a>
+    </h1>
+  
 
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=https://herden.gitee.io/2021/07/13/flink-plat/" alt="微信分享二维码">
-    </div>
-</div>
+        <div class="article-info info-on-right">
+          
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">realtime-platform</a>
+        		</li>
+      		
+		</ul>
+	</div>
 
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+          
+
+        </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2021/08/04/flink-cdc-source-code-analysis/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          【flink源码】Flink-cdc-connector源码分析
-        
-      </div>
-    </a>
   
   
-    <a href="/2021/02/25/flink-client-source-analysis/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">【flink源码】从Flink client 提交源码看第三方jar包的动态加载的解决方案</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-        <div class="toc-container tooltip-left">
-            <i class="icon-font icon-category"></i>
-            <div class="tooltip tooltip-east">
-                <span class="tooltip-item">
-                </span>
-                <span class="tooltip-content">
-                    <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E6%97%B6%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%AF%94"><span class="toc-number">1.</span> <span class="toc-text">实时平台对比</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BE%8E%E5%9B%A2%E5%AE%9E%E6%97%B6%E5%B9%B3%E5%8F%B0"><span class="toc-number">1.0.1.</span> <span class="toc-text">美团实时平台</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%84%E6%A8%A1"><span class="toc-number">1.0.1.1.</span> <span class="toc-text">规模</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84"><span class="toc-number">1.0.1.2.</span> <span class="toc-text">架构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF"><span class="toc-number">1.0.2.</span> <span class="toc-text">业务场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E6%97%B6%E6%95%B0%E4%BB%93%E5%BB%BA%E8%AE%BE%E6%96%B9%E5%BC%8F"><span class="toc-number">1.0.3.</span> <span class="toc-text">实时数仓建设方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E7%AB%99%E5%BC%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88-%E5%AE%9E%E6%97%B6%E5%BC%80%E5%8F%91%E5%B9%B3%E5%8F%B0"><span class="toc-number">1.0.4.</span> <span class="toc-text">一站式解决方案-实时开发平台</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%BD%E6%9C%AA%E6%9D%A5%E5%AE%9E%E6%97%B6%E5%BC%80%E5%8F%91%E5%B9%B3%E5%8F%B0"><span class="toc-number">1.0.5.</span> <span class="toc-text">好未来实时开发平台</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94"><span class="toc-number">1.0.6.</span> <span class="toc-text">对比</span></a></li></ol></li></ol></li></ol>
-                    </div>
-                </span>
-            </div>
-        </div>
-        
-    </div>
-</aside>
-
-
-
-  
-  
+    </div></section>
   
 
-  
-
-  
-
-  
+    
 
 
           </div>
@@ -449,8 +263,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
-		isArchive: false,
+		isPost: false,
+		isArchive: true,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
@@ -628,6 +442,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
               </li>
             
             <div class="clearfix"></div>
