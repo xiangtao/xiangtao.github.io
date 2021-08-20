@@ -185,6 +185,177 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-hbase-row-transaction-model" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/02/19/hbase-row-transaction-model/">数据库事务系列－HBase行级事务模型</a>
+    </h1>
+  
+
+        
+        <a href="/2020/02/19/hbase-row-transaction-model/" class="archive-article-date">
+  	<time datetime="2020-02-19T12:58:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>HBase是BigTable的开源实现，事务模型也与BigTable一脉相承 – 仅支持行级别的事务。虽然Jeff Dean大神在接受采访时公开承认目前在技术领域最后悔的事情就是没有在BigTable中加入跨行事务模型，以至于之后很多团队都在BigTable之上重复造各种各样的分布式事务轮子。这点笔者是认同的，现在确实有很多团队在HBase之上造了很多轮子（Tephra | Trafodian | Omid），试想如果这个工作做在了BigTable里面，这些团队的人是不是可以做更多其他有意义的事情了~ 所幸的是之后Google又发布了一篇介绍分布式事务模型的的paper – Percolator，现在很多团队都参考该论文实现分布式事务，包括TiDB、Omid等，也算是一种弥补吧。<br>虽说HBase目前只支持行级事务，但行级事务也是事务！麻雀虽小，肝脏具全。这篇文章一起看看HBase行级事务所满足的ACID特性。下文中隔离性部分基本翻译文章《Apache HBase Internals: Locking and Multiversion Concurrency Control》，大家可以阅读原文。</p>
+        
+          <a class="article-more-a" href="/2020/02/19/hbase-row-transaction-model/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">事物</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">hbase</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">mvcc</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/02/19/hbase-row-transaction-model/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-hbase-meta" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/02/16/hbase-meta/">hbase meta表介绍</a>
+    </h1>
+  
+
+        
+        <a href="/2020/02/16/hbase-meta/" class="archive-article-date">
+  	<time datetime="2020-02-16T14:09:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在hbase0.98之前hbase元数据表有两个：ROOT表与meta表。在hbase0.98之后，hbase就废弃了ROOT表，仅保留meta并且该表不允许split,所以只有一个Region。</p>
+<h3 id="meta表位置"><a href="#meta表位置" class="headerlink" title="meta表位置"></a>meta表位置</h3><p>meta表保存了集群中所有region的位置信息，当我们通过客户端put,get,delete等操作数据的时候，首先会去这个表里查找该数据所在的regionserver位置。<br>但是 meta表也是一个hbase表，那怎么找个表的regionserver呢？答案时：通过zookeeper。<br>    hbsse把meta表的region信息保存到了zookeeper里，对应路径为：/hbase/meta-region-server</p>
+<h3 id="meta表结构信息"><a href="#meta表结构信息" class="headerlink" title="meta表结构信息"></a>meta表结构信息</h3><p>rowkey为：**<em>表名,该region的startKey,创建时间.hash值**</em>。<br>其中：hash值为：MD5Hash.getMD5AsHex(byte(表名,该region的startKey,创建时间))<br>如果当前region为table的第一个region时，region startKey=null</p>
+<p>meta表只有一个列簇info，并且包含四列：</p>
+<ol>
+<li>regioninfo ：当前region的startKey与endKey，name，encode等消息</li>
+<li>seqnumDuringOpen：</li>
+<li>server：region所在服务器及端口</li>
+<li>serverstartcode：服务开始的时候的timestamp</li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">habse</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">大数据</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/02/16/hbase-meta/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-springboot-graceful-shutdown" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -940,15 +1111,27 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">apache</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">olap</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">doris</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">realtime-dw</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">事物</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">apache</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -984,11 +1167,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">hbase</a>
+                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">mvcc</a>
+                <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1008,11 +1191,27 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">hbase</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">mvcc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">数据库连接池</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">binlog</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">mysql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">mysql-replication</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1029,22 +1228,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">flink-cdc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">binlog</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">mysql-replication</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
               </li>
             
             <div class="clearfix"></div>

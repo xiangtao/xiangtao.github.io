@@ -185,6 +185,207 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-base-doris-olap-realtime-dw-in-xdf" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/19/base-doris-olap-realtime-dw-in-xdf/">准实时数仓在新东方在线教育的落地实践</a>
+    </h1>
+  
+
+        
+        <a href="/2021/08/19/base-doris-olap-realtime-dw-in-xdf/" class="archive-article-date">
+  	<time datetime="2021-08-19T02:47:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>在传统数据仓库方面，通常以T+1离线批量计算为主，按照数仓建模方式，把要处理的业务按照主题域划分，构建各种数据模型，来满足公司经营分析，财务分析等各种公司管理层的数据需求。<br>然而，随着在线教育快速发展市场竞争非常激烈，T+1的方式在某些需求上很难对业务产生实际的价值，很可能因为数据延迟导致业务动作滞后，管理要求跟进不及时，最终导致客户流失，影响公司业务发展。<br>目前遇到的主要痛点如下：</p>
+<ol>
+<li><p>续费业务场景<br> 在线教育上课主要分为4个时段（春季，暑假，秋季，寒假）。当每一个时段上课要结束的时候，就会有一个续费周期，每个学科每个班级续费率的高低直接影响公司是否盈利的问题。所以实时的观测每个学科每个班级每个学科负责人每个教学负责人的续费率完成情况就显的尤为重要</p>
+</li>
+<li><p>直播到课人/率场景  </p>
+</li>
+<li><p>算法线索分场景<br>每当进行广告投放的时候，针对每一个销售线索给出一个评分值，来评估这个线索可能转化的高低，利于销售人员更好的跟进，提高转化率</p>
+<h3 id="实时数仓技术架构"><a href="#实时数仓技术架构" class="headerlink" title="实时数仓技术架构"></a>实时数仓技术架构</h3><h4 id="实时数仓选型"><a href="#实时数仓选型" class="headerlink" title="实时数仓选型"></a>实时数仓选型</h4><p>在2020年以前公司实时数据部分，主要由小时级和分钟级的支持。小时级部分使用基于hive/spark的小时级任务方案，分钟级使用spark-streaming方案。  </p>
+</li>
+</ol>
+<ul>
+<li>基于hive/spark小时级方案虽然能满足快速响应业务需求和变化的特点，但延迟性还是很高，并且大量的小时任务对集群计算资源有很大压力，很有可能导致这一批小时任务根本跑不完。  </li>
+<li>分钟级spark-streaming方案，能够满足数据时效性需求，但采用纯代码方式来开发，无法满足快速变化的数据需求  </li>
+</ul>
+<p>基于此，我们开始调研业界方案，目前业界有主要有两种实时数仓方案，分别是：  </p>
+<h5 id="实时数仓方案："><a href="#实时数仓方案：" class="headerlink" title="实时数仓方案："></a>实时数仓方案：</h5><p>分别可以采用lambda架构和kappa架构 </p>
+<ol>
+<li>lambda架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210819032639519.png"><br>如上图所实例：存在离线和实时两条链路。实时部分以消息队列的方式实时增量消费，一般以flink和kafka的组合实现，维度表存在mysql数据库或者hbase；离线部分一般采用T+1周期调度分析历史存量数据，每天凌晨产出，更新覆盖前一天的结果数据，计算引擎通常会选择hive. 优点是数据准确度高，出错后容易修复数据；缺点是架构复杂，运维成本高。</li>
+<li>kappa架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210819033215109.png"><br>kappa架构是由LinkedIn的Jay Kreps提出的，作为lambda方案的一个简化版，它移除了离线生产链路，思路是通过在kafka里保存全量历史数据，当需要历史计算的时候，就启动一个任务从头开始消费数据。优点是架构相对简化，数据来源单一，共用一套代码，开发效率高；缺点是必须要求消息队列中保存了存量数据，而且主要业务逻辑在计算层，比较消耗内存计算资源。</li>
+</ol>
+<p>但由于之前流处理系统本身不成熟，对窗口计算，事件时间，乱序问题和SQL支持上的不成熟，导致大部分公司普遍采用了lambda架构方案。但自从2020年2月11日，flink发布了1.10以及随后的1.11版本，引入了blink planner和hive集成极大的增强了在SQL和流批一体支持上，这为真正实现kappa架构带来了一丝希望。</p>
+<h5 id="准实时数仓方案："><a href="#准实时数仓方案：" class="headerlink" title="准实时数仓方案："></a>准实时数仓方案：</h5><p><img src="/base-doris-olap-realtime-dw-in-xdf/20210819082651546.png"><br>其核心思路是，采用olap引擎来解决聚合计算和明显数据查询问题，配合分钟级别调度（一般是30或者15分钟）能力来支持业务实时数据需求。这个架构优点是： </p>
+<ul>
+<li>一般olap引擎都对SQL支持度很好，开发成本极低 少量人员都可以支持复杂的业务需求，灵活应对业务变化。对于差钱的公司来说无疑非常节约成本的（财大气粗的公司除外）</li>
+<li>对于数据修复成本低，因为可以基于一个周期内的数据进行全量计算，所以修复数据只需要重跑任务即可。</li>
+<li>对于运维成本也较低，只需要监控任务运行成功失败即可</li>
+<li>对于数据时效性要求极高的场景，配合flink实时计算能力，在数据接入的时候进行部分聚合计算在把结果写入olap引擎，不需要再配合调度计算，已此来到达秒级延迟。<br>该架构的缺点是：</li>
+<li>将计算转移到了olap引擎并同时兼顾了计算和查询需求，对olap引擎性能有较高的要求</li>
+<li>因为计算转移到了olap端，所以这种方案适用的数据体量规模有限制</li>
+</ul>
+<h4 id="基于doris的准实时方案"><a href="#基于doris的准实时方案" class="headerlink" title="基于doris的准实时方案"></a>基于doris的准实时方案</h4><p>结合公司数据规模，业务灵活性，成本方面的考虑我们选用的准实时的方案。<br>那么接下来的就是确定采用什么olap引擎的问题了，目前业界开源的olap引擎主要有: clickhouse,durid,doris,impala+kudu,presto<br>这些引擎目前业界都有公司采用，比如：<br>头条采用clickhouse(因为头条数据量巨大，并且头条专门有一个团队来优化和改进clickhouse内核，有钱就是好)，快手采用durid,doris美团/作业帮有采用，impala+kudu网易是深度用户，presto主要用做adhoc查询。<br>对此可以看到，这些引擎都可以采用主要问题是，是否对这些引擎有足够的掌握程度以及引擎本身学习成本。经过一番对比以及之前本身对doris有一定的了解和横行对比使用的公司的规模，最后选择了doris引擎。<br>doris的优点如下：</p>
+<ul>
+<li>单表和多表join查询性能都很强，可以同时较好支持宽表查询场景和复杂多表查询，灵活性高</li>
+<li>支持实时数据更新操作</li>
+<li>支持流式和批量数据导入</li>
+<li>兼容mysql协议和标准sql</li>
+<li>支持ha，在线升级扩容，运维成本低</li>
+</ul>
+<h5 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h5><p><img src="/base-doris-olap-realtime-dw-in-xdf/20210819052757626.png"><br>上图是目前公司采用的架构方案，总体流程如下：</p>
+<ol>
+<li>数据接入部分，分为业务数据和日志数据。业务数据通过binlog方式收集到kafka后，在通过flink写入到doris ods层中</li>
+<li>mds层，采用每10分钟、半小时、一小时进行增量或全量的方式更新，构建业务模型层</li>
+<li>ads层，构建大宽表层加速上层查询速度</li>
+<li>对于一些分析类查询需求，通过doris的export功能导出到hive通过presto提供查询</li>
+<li>BI查询直接通过mysql协议访问db，配合查询层缓存来提供报表分析服务</li>
+<li>每层ETL任务通过自研调度系统调度运行，报警监控一体化</li>
+</ol>
+<h5 id="使用doris遇到的一些问题"><a href="#使用doris遇到的一些问题" class="headerlink" title="使用doris遇到的一些问题"></a>使用doris遇到的一些问题</h5><p>在实际业务应用中也遇到了一些问题，主要有如下几个方面的问题</p>
+<ol>
+<li>xx</li>
+<li>xx</li>
+</ol>
+<h4 id="使用总结"><a href="#使用总结" class="headerlink" title="使用总结"></a>使用总结</h4><ul>
+<li>在资源有限的情况，实时数仓还不能完全代替离线数仓。实时数仓对资源要求较高，成本换时间。离线数仓是时间换成本。也许在不久的将来随着算力的提高，新的技术的应用可以实现，但，目前还没有。</li>
+<li>随着数据量的增加计算延迟也会增加，两者呈线性关系。这就需要在业务需求和成本上做一个折中</li>
+<li>使用doris支撑了公司大部分实时数据需求，在保证开发成本和使用灵活性方面非常友好</li>
+<li>未来随着flink SQL方面越来越成熟可以把计算任务压力进一步转移到flink上，结合doris的olap能力，可以提供更低延迟数据需求</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">olap</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">doris</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">realtime-dw</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/19/base-doris-olap-realtime-dw-in-xdf/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-base-doris-olap-realtime-dw" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/19/base-doris-olap-realtime-dw/">base-doris-olap-realtime-dw</a>
+    </h1>
+  
+
+        
+        <a href="/2021/08/19/base-doris-olap-realtime-dw/" class="archive-article-date">
+  	<time datetime="2021-08-19T02:47:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/19/base-doris-olap-realtime-dw/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-flink-cdc-2-demo" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -308,11 +509,11 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">binlog</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">binlog</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
@@ -401,11 +602,11 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">flink-cdc</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">binlog</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">binlog</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">flink-cdc</a>
         		</li>
       		
 		</ul>
@@ -959,160 +1160,6 @@
 
 
   
-    <article id="post-enterpise-datawarehouse-" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/23/enterpise-datawarehouse-/">how-to-build-enterpise-bigdata-datawarehouse</a>
-    </h1>
-  
-
-        
-        <a href="/2020/03/23/enterpise-datawarehouse-/" class="archive-article-date">
-  	<time datetime="2020-03-23T15:29:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-23</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文根据阿里云高级技术专家李金波在首届阿里巴巴在线峰会的《企业大数据平台仓库架构建设思路》的分享整理而成。随着互联网规模不断的扩大，数据也在爆炸式地增长，各种结构化、半结构化、非结构化数据的产生，越来越多的企业开始在大数据平台下进行数据处理。分享中，李金波主要从总体思路、模型设计、数加架构、数据治理四个方面介绍了如何利用大数据平台的特性，构建更贴合大数据应用的数据仓库。</p>
-        
-          <a class="article-more-a" href="/2020/03/23/enterpise-datawarehouse-/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">数据仓库</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/23/enterpise-datawarehouse-/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-how-size-db-connection-poll" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/23/how-size-db-connection-poll/">数据库连接池到底应该设多大？</a>
-    </h1>
-  
-
-        
-        <a href="/2020/03/23/how-size-db-connection-poll/" class="archive-article-date">
-  	<time datetime="2020-03-23T15:03:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-23</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>我在研究HikariCP（一个数据库连接池）时无意间在HikariCP的Github wiki上看到了一篇文章（<a target="_blank" rel="noopener" href="https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing">https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing</a> ），这篇文章有力地消除了我一直以来的疑虑，看完之后感觉神清气爽。故在此做译文分享。</p>
-<p>接下来是正文</p>
-<p>数据库连接池的配置是开发者们常常搞出坑的地方，在配置数据库连接池时，有几个可以说是和直觉背道而驰的原则需要明确。</p>
-        
-          <a class="article-more-a" href="/2020/03/23/how-size-db-connection-poll/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">数据库连接池</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/23/how-size-db-connection-poll/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1218,15 +1265,27 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">apache</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">olap</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">doris</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">realtime-dw</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">事物</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">apache</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1262,11 +1321,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">hbase</a>
+                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">mvcc</a>
+                <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1286,11 +1345,27 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">hbase</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">mvcc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">数据库连接池</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">binlog</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">mysql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">mysql-replication</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1307,22 +1382,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">flink-cdc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">binlog</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">mysql-replication</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
               </li>
             
             <div class="clearfix"></div>
