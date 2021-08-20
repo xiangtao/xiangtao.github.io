@@ -20,7 +20,7 @@
 <meta property="og:image" content="https://herden.gitee.io/base-doris-olap-realtime-dw-in-xdf/20210819082651546.png">
 <meta property="og:image" content="https://herden.gitee.io/base-doris-olap-realtime-dw-in-xdf/20210819052757626.png">
 <meta property="article:published_time" content="2021-08-19T02:47:35.000Z">
-<meta property="article:modified_time" content="2021-08-19T12:34:48.278Z">
+<meta property="article:modified_time" content="2021-08-20T02:31:33.688Z">
 <meta property="article:author" content="taox">
 <meta property="article:tag" content="olap">
 <meta property="article:tag" content="doris">
@@ -232,9 +232,8 @@
 <h5 id="实时数仓方案："><a href="#实时数仓方案：" class="headerlink" title="实时数仓方案："></a>实时数仓方案：</h5><p>分别可以采用lambda架构和kappa架构 </p>
 <ol>
 <li>lambda架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210819032639519.png"><br>如上图所实例：存在离线和实时两条链路。实时部分以消息队列的方式实时增量消费，一般以flink和kafka的组合实现，维度表存在mysql数据库或者hbase；离线部分一般采用T+1周期调度分析历史存量数据，每天凌晨产出，更新覆盖前一天的结果数据，计算引擎通常会选择hive. 优点是数据准确度高，出错后容易修复数据；缺点是架构复杂，运维成本高。</li>
-<li>kappa架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210819033215109.png"><br>kappa架构是由LinkedIn的Jay Kreps提出的，作为lambda方案的一个简化版，它移除了离线生产链路，思路是通过在kafka里保存全量历史数据，当需要历史计算的时候，就启动一个任务从头开始消费数据。优点是架构相对简化，数据来源单一，共用一套代码，开发效率高；缺点是必须要求消息队列中保存了存量数据，而且主要业务逻辑在计算层，比较消耗内存计算资源。</li>
+<li>kappa架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210819033215109.png"><br>kappa架构是由LinkedIn的Jay Kreps提出的，作为lambda方案的一个简化版，它移除了离线生产链路，思路是通过在kafka里保存全量历史数据，当需要历史计算的时候，就启动一个任务从头开始消费数据。优点是架构相对简化，数据来源单一，共用一套代码，开发效率高；缺点是必须要求消息队列中保存了存量数据，而且主要业务逻辑在计算层，比较消耗内存计算资源。<br>但由于之前流处理系统本身不成熟，对窗口计算，事件时间，乱序问题和SQL支持上的不成熟，导致大部分公司普遍采用了lambda架构方案。但自从2020年2月11日，flink发布了1.10以及随后的1.11版本，引入了blink planner和hive集成极大的增强了在SQL和流批一体支持上，这为真正实现kappa架构带来了一丝希望。</li>
 </ol>
-<p>但由于之前流处理系统本身不成熟，对窗口计算，事件时间，乱序问题和SQL支持上的不成熟，导致大部分公司普遍采用了lambda架构方案。但自从2020年2月11日，flink发布了1.10以及随后的1.11版本，引入了blink planner和hive集成极大的增强了在SQL和流批一体支持上，这为真正实现kappa架构带来了一丝希望。</p>
 <h5 id="准实时数仓方案："><a href="#准实时数仓方案：" class="headerlink" title="准实时数仓方案："></a>准实时数仓方案：</h5><p><img src="/base-doris-olap-realtime-dw-in-xdf/20210819082651546.png"><br>其核心思路是，采用olap引擎来解决聚合计算和明显数据查询问题，配合分钟级别调度（一般是30或者15分钟）能力来支持业务实时数据需求。这个架构优点是： </p>
 <ul>
 <li>一般olap引擎都对SQL支持度很好，开发成本极低 少量人员都可以支持复杂的业务需求，灵活应对业务变化。对于差钱的公司来说无疑非常节约成本的（财大气粗的公司除外）</li>
