@@ -58,8 +58,6 @@
 	        
 				<li><a href="/tags/java/">java</a></li>
 	        
-				<li><a href="/tags/spring/">spring</a></li>
-	        
 				<li><a href="/tags/spring-boot/">spring-boot</a></li>
 	        
 				<li><a href="/tags/flink/">flink</a></li>
@@ -134,8 +132,6 @@
 			
 				
 			
-				
-			
 			
 			
 			<nav class="header-nav">
@@ -154,21 +150,19 @@
 				<ul style="width: 70%">
 				
 				
-					<li style="width: 12.5%"><a href="/">主页</a></li>
+					<li style="width: 14.285714285714286%"><a href="/">主页</a></li>
 		        
-					<li style="width: 12.5%"><a href="/tags/java/">java</a></li>
+					<li style="width: 14.285714285714286%"><a href="/tags/java/">java</a></li>
 		        
-					<li style="width: 12.5%"><a href="/tags/spring/">spring</a></li>
+					<li style="width: 14.285714285714286%"><a href="/tags/spring-boot/">spring-boot</a></li>
 		        
-					<li style="width: 12.5%"><a href="/tags/spring-boot/">spring-boot</a></li>
+					<li style="width: 14.285714285714286%"><a href="/tags/flink/">flink</a></li>
 		        
-					<li style="width: 12.5%"><a href="/tags/flink/">flink</a></li>
+					<li style="width: 14.285714285714286%"><a href="/contactme/index.html">加我交流</a></li>
 		        
-					<li style="width: 12.5%"><a href="/contactme/index.html">加我交流</a></li>
+					<li style="width: 14.285714285714286%"><a href="/beijing-covius-19/index.html">北京新冠肺炎</a></li>
 		        
-					<li style="width: 12.5%"><a href="/beijing-covius-19/index.html">北京新冠肺炎</a></li>
-		        
-					<li style="width: 12.5%"><a target="_blank" rel="noopener" href="http://www.ppsport.com/premierleague?tabgo=scoreboard">英超</a></li>
+					<li style="width: 14.285714285714286%"><a target="_blank" rel="noopener" href="http://www.ppsport.com/premierleague?tabgo=scoreboard">英超</a></li>
 		        
 				</ul>
 			</nav>
@@ -184,177 +178,6 @@
           </div>
           <div id="js-content" class="content-ll">
             
-  
-    <article id="post-hbase-row-transaction-model" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/02/19/hbase-row-transaction-model/">数据库事务系列－HBase行级事务模型</a>
-    </h1>
-  
-
-        
-        <a href="/2020/02/19/hbase-row-transaction-model/" class="archive-article-date">
-  	<time datetime="2020-02-19T12:58:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>HBase是BigTable的开源实现，事务模型也与BigTable一脉相承 – 仅支持行级别的事务。虽然Jeff Dean大神在接受采访时公开承认目前在技术领域最后悔的事情就是没有在BigTable中加入跨行事务模型，以至于之后很多团队都在BigTable之上重复造各种各样的分布式事务轮子。这点笔者是认同的，现在确实有很多团队在HBase之上造了很多轮子（Tephra | Trafodian | Omid），试想如果这个工作做在了BigTable里面，这些团队的人是不是可以做更多其他有意义的事情了~ 所幸的是之后Google又发布了一篇介绍分布式事务模型的的paper – Percolator，现在很多团队都参考该论文实现分布式事务，包括TiDB、Omid等，也算是一种弥补吧。<br>虽说HBase目前只支持行级事务，但行级事务也是事务！麻雀虽小，肝脏具全。这篇文章一起看看HBase行级事务所满足的ACID特性。下文中隔离性部分基本翻译文章《Apache HBase Internals: Locking and Multiversion Concurrency Control》，大家可以阅读原文。</p>
-        
-          <a class="article-more-a" href="/2020/02/19/hbase-row-transaction-model/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">事物</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">hbase</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">mvcc</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/02/19/hbase-row-transaction-model/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-hbase-meta" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/02/16/hbase-meta/">hbase meta表介绍</a>
-    </h1>
-  
-
-        
-        <a href="/2020/02/16/hbase-meta/" class="archive-article-date">
-  	<time datetime="2020-02-16T14:09:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-16</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在hbase0.98之前hbase元数据表有两个：ROOT表与meta表。在hbase0.98之后，hbase就废弃了ROOT表，仅保留meta并且该表不允许split,所以只有一个Region。</p>
-<h3 id="meta表位置"><a href="#meta表位置" class="headerlink" title="meta表位置"></a>meta表位置</h3><p>meta表保存了集群中所有region的位置信息，当我们通过客户端put,get,delete等操作数据的时候，首先会去这个表里查找该数据所在的regionserver位置。<br>但是 meta表也是一个hbase表，那怎么找个表的regionserver呢？答案时：通过zookeeper。<br>    hbsse把meta表的region信息保存到了zookeeper里，对应路径为：/hbase/meta-region-server</p>
-<h3 id="meta表结构信息"><a href="#meta表结构信息" class="headerlink" title="meta表结构信息"></a>meta表结构信息</h3><p>rowkey为：**<em>表名,该region的startKey,创建时间.hash值**</em>。<br>其中：hash值为：MD5Hash.getMD5AsHex(byte(表名,该region的startKey,创建时间))<br>如果当前region为table的第一个region时，region startKey=null</p>
-<p>meta表只有一个列簇info，并且包含四列：</p>
-<ol>
-<li>regioninfo ：当前region的startKey与endKey，name，encode等消息</li>
-<li>seqnumDuringOpen：</li>
-<li>server：region所在服务器及端口</li>
-<li>serverstartcode：服务开始的时候的timestamp</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">habse</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">大数据</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/02/16/hbase-meta/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
   
     <article id="post-springboot-graceful-shutdown" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
@@ -517,8 +340,6 @@
         <h2 id="什么是Spring-Boot"><a href="#什么是Spring-Boot" class="headerlink" title="什么是Spring Boot?"></a>什么是Spring Boot?</h2><p>Spring Boot是Spring开源组织下的子项目，是Spring组件一站式解决方案，主要是简化了使用Spring的难度，简省了繁重的配置，提供了各种启动器，开发者能快速上手。</p>
 <p>官方网站：<a target="_blank" rel="noopener" href="http://projects.spring.io/spring-boot/">http://projects.spring.io/spring-boot/</a><br>GitHub源码：<a target="_blank" rel="noopener" href="https://github.com/spring-projects/spring-boot">https://github.com/spring-projects/spring-boot</a></p>
 <h3 id="Spring-Boot的优点"><a href="#Spring-Boot的优点" class="headerlink" title="Spring Boot的优点"></a>Spring Boot的优点</h3><p>** Features **</p>
-<blockquote>
-</blockquote>
 <ul>
 <li> Create stand-alone Spring applications</li>
 <li> Embed Tomcat, Jetty or Undertow directly (no need to deploy WAR files)</li>
@@ -532,21 +353,15 @@
 </ol>
 <p>Spring Boot而且内嵌了各种servlet容器，Tomcat、Jetty等，现在不再需要打成war包部署到容器中，Spring Boot只要打成一个可执行的jar包就能独立运行，所有的依赖包都在一个jar包内。</p>
 <ol start="2">
-<li>简化配置 </li>
+<li><p>简化配置<br>spring-boot-starter-web启动器自动依赖其他组件，简少了maven的配置。<br><img src="/images/springboot-introduction/1.png"></p>
+</li>
+<li><p>自动配置<br>Spring Boot能根据当前类路径下的类、jar包来自动配置bean，如添加一个spring-boot-starter-web启动器就能拥有web的功能，无需其他配置。</p>
+</li>
+<li><p>无代码生成和XML配置<br>Spring Boot配置过程中无代码生成，也无需XML配置文件就能完成所有配置工作，这一切都是借助于条件注解完成的，这也是Spring4.x的核心功能之一。</p>
+</li>
+<li><p>应用监控<br>Spring Boot提供一系列端点可以监控服务及应用，做健康检测。</p>
+</li>
 </ol>
-<p>spring-boot-starter-web启动器自动依赖其他组件，简少了maven的配置。<br><img src="/images/springboot-introduction/.png"></p>
-<ol start="3">
-<li>自动配置</li>
-</ol>
-<p>Spring Boot能根据当前类路径下的类、jar包来自动配置bean，如添加一个spring-boot-starter-web启动器就能拥有web的功能，无需其他配置。</p>
-<ol start="4">
-<li>无代码生成和XML配置</li>
-</ol>
-<p>Spring Boot配置过程中无代码生成，也无需XML配置文件就能完成所有配置工作，这一切都是借助于条件注解完成的，这也是Spring4.x的核心功能之一。</p>
-<ol start="5">
-<li>应用监控</li>
-</ol>
-<p>Spring Boot提供一系列端点可以监控服务及应用，做健康检测。</p>
 <h2 id="Spring-Boot的缺点"><a href="#Spring-Boot的缺点" class="headerlink" title="Spring Boot的缺点"></a>Spring Boot的缺点</h2><p>Spring Boot虽然上手很容易，但如果你不了解其核心技术及流程，所以一旦遇到问题就很棘手，而且现在的解决方案也不是很多，需要一个完善的过程。</p>
 
       
@@ -1127,15 +942,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">事物</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1171,15 +986,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">分布式事务</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
               </li>
              
               <li class="article-tag-list-item">
