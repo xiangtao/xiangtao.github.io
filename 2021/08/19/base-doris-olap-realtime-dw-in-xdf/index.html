@@ -8,12 +8,12 @@
   <link rel="dns-prefetch" href="https://herden.gitee.io">
   <title>实时数仓在新东方在线教育的落地实践 | taox的博客|开发者驿站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="背景介绍在传统数据仓库方面，通常以T+1离线批量计算为主，按照数仓建模方式，把要处理的业务按照主题域划分，构建各种数据模型，来满足公司经营分析，财务分析等各种公司管理层的数据需求。然而，随着在线教育快速发展市场竞争非常激烈，T+1的方式在某些需求上很难对业务产生实际的价值，很可能因为数据延迟导致业务动作滞后，管理要求跟进不及时，最终导致客户流失，影响公司业务发展。目前遇到的主要痛点如下  续费业务">
+  <meta name="description" content="背景介绍在传统数据仓库方面，通常以T+1离线批量计算为主，按照数仓建模方式，把要处理的业务按照主题域划分，构建各种数据模型，来满足公司经营分析，财务分析等各种公司管理层的数据需求。然而，随着在线教育快速发展市场竞争非常激烈，T+1的方式在某些需求上很难对业务产生实际的价值，很可能因为数据延迟导致业务动作滞后，管理要求跟进不及时，最终导致客户流失，影响公司业务发展。目前我们遇到的主要痛点如下  续费">
 <meta property="og:type" content="article">
 <meta property="og:title" content="实时数仓在新东方在线教育的落地实践">
 <meta property="og:url" content="https://herden.gitee.io/2021/08/19/base-doris-olap-realtime-dw-in-xdf/index.html">
 <meta property="og:site_name" content="taox的博客|开发者驿站">
-<meta property="og:description" content="背景介绍在传统数据仓库方面，通常以T+1离线批量计算为主，按照数仓建模方式，把要处理的业务按照主题域划分，构建各种数据模型，来满足公司经营分析，财务分析等各种公司管理层的数据需求。然而，随着在线教育快速发展市场竞争非常激烈，T+1的方式在某些需求上很难对业务产生实际的价值，很可能因为数据延迟导致业务动作滞后，管理要求跟进不及时，最终导致客户流失，影响公司业务发展。目前遇到的主要痛点如下  续费业务">
+<meta property="og:description" content="背景介绍在传统数据仓库方面，通常以T+1离线批量计算为主，按照数仓建模方式，把要处理的业务按照主题域划分，构建各种数据模型，来满足公司经营分析，财务分析等各种公司管理层的数据需求。然而，随着在线教育快速发展市场竞争非常激烈，T+1的方式在某些需求上很难对业务产生实际的价值，很可能因为数据延迟导致业务动作滞后，管理要求跟进不及时，最终导致客户流失，影响公司业务发展。目前我们遇到的主要痛点如下  续费">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://herden.gitee.io/base-doris-olap-realtime-dw-in-xdf/20210819032639519.png">
 <meta property="og:image" content="https://herden.gitee.io/base-doris-olap-realtime-dw-in-xdf/20210820054517606.png">
@@ -22,7 +22,7 @@
 <meta property="og:image" content="https://herden.gitee.io/base-doris-olap-realtime-dw-in-xdf/20210820061524659.png">
 <meta property="og:image" content="https://herden.gitee.io/base-doris-olap-realtime-dw-in-xdf/20210820061634668.png">
 <meta property="article:published_time" content="2021-08-19T02:47:35.000Z">
-<meta property="article:modified_time" content="2021-08-20T11:53:11.098Z">
+<meta property="article:modified_time" content="2021-08-22T04:13:08.593Z">
 <meta property="article:author" content="taox">
 <meta property="article:tag" content="olap">
 <meta property="article:tag" content="doris">
@@ -210,15 +210,27 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>在传统数据仓库方面，通常以T+1离线批量计算为主，按照数仓建模方式，把要处理的业务按照主题域划分，构建各种数据模型，来满足公司经营分析，财务分析等各种公司管理层的数据需求。<br>然而，随着在线教育快速发展市场竞争非常激烈，T+1的方式在某些需求上很难对业务产生实际的价值，很可能因为数据延迟导致业务动作滞后，管理要求跟进不及时，最终导致客户流失，影响公司业务发展。<br>目前遇到的主要痛点如下</p>
+        <h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>在传统数据仓库方面，通常以T+1离线批量计算为主，按照数仓建模方式，把要处理的业务按照主题域划分，构建各种数据模型，来满足公司经营分析，财务分析等各种公司管理层的数据需求。<br>然而，随着在线教育快速发展市场竞争非常激烈，T+1的方式在某些需求上很难对业务产生实际的价值，很可能因为数据延迟导致业务动作滞后，管理要求跟进不及时，最终导致客户流失，影响公司业务发展。<br>目前我们遇到的主要痛点如下</p>
 <ol>
-<li><p>续费业务场景<br>在线教育上课主要分为4个时段（春季，暑假，秋季，寒假）。当每一个时段上课要结束的时候，就会有一个续费周期，每个学科每个班级续费率的高低直接影响公司是否盈利的问题。所以实时的观测每个学科每个班级每个学科负责人每个教学负责人的续费率完成情况就显的尤为重要。</p>
+<li><p>续费业务场景</p>
+<blockquote>
+<p>在线教育上课主要分为4个时段（春季，暑假，秋季，寒假）。当每一个时段上课要结束的时候，就会有一个续费周期，每个学科每个班级续费率的高低直接影响公司是否盈利的问题。所以实时的观测每个学科每个班级每个学科负责人每个教学负责人的续费率完成情况就显的尤为重要。</p>
+</blockquote>
 </li>
-<li><p>直播行课场景<br>分析课中学员与老师互动行为，其中包含实时的连麦、发言、红包等行为数据，同时分析学员实时到课、完课、考试等数据对于管理学员和调整老师动作有重要的指导意义。</p>
+<li><p>直播行课场景  </p>
+<blockquote>
+<p>分析课中学员与老师互动行为，其中包含实时的连麦、发言、红包等行为数据，同时分析学员实时到课、完课、考试等数据对于管理学员和调整老师动作有重要的指导意义。</p>
+</blockquote>
 </li>
-<li><p>销售场景<br>监控新线索的实时分配，以及后续销售外呼频次、外呼时长，统计销售线索覆盖量，外呼覆盖量等指标。通过分析销售对于学员的跟进与转化数据，对比个人和团队当日人次和金额达成目标，指导运营管理动作。</p>
+<li><p>销售场景  </p>
+<blockquote>
+<p>监控新线索的实时分配，以及后续销售外呼频次、外呼时长，统计销售线索覆盖量，外呼覆盖量等指标。通过分析销售对于学员的跟进与转化数据，对比个人和团队当日人次和金额达成目标，指导运营管理动作。</p>
+</blockquote>
 </li>
-<li><p>算法线索分场景<br>每当进行广告投放的时候，针对每一个销售线索给出一个评分值，来评估这个线索可能转化的高低，利于销售人员更好的跟进，提高转化率。</p>
+<li><p>算法线索分场景  </p>
+<blockquote>
+<p>每当进行广告投放的时候，针对每一个销售线索给出一个评分值，来评估这个线索可能转化的高低，利于销售人员更好的跟进，提高转化率。</p>
+</blockquote>
 <h3 id="实时数仓技术架构"><a href="#实时数仓技术架构" class="headerlink" title="实时数仓技术架构"></a>实时数仓技术架构</h3><h4 id="实时数仓选型"><a href="#实时数仓选型" class="headerlink" title="实时数仓选型"></a>实时数仓选型</h4><p>在2020年以前公司实时数据部分，主要由小时级和分钟级的支持。小时级部分使用基于hive/spark的小时级任务方案，分钟级使用spark-streaming方案。</p>
 </li>
 </ol>
@@ -230,18 +242,21 @@
 <h5 id="实时数仓方案："><a href="#实时数仓方案：" class="headerlink" title="实时数仓方案："></a>实时数仓方案：</h5><p>分别可以采用lambda架构和kappa架构 </p>
 <ol>
 <li>lambda架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210819032639519.png"><br>如上图所实例：存在离线和实时两条链路。实时部分以消息队列的方式实时增量消费，一般以flink和kafka的组合实现，维度表存在mysql数据库或者hbase；离线部分一般采用T+1周期调度分析历史存量数据，每天凌晨产出，更新覆盖前一天的结果数据，计算引擎通常会选择hive. 优点是数据准确度高，出错后容易修复数据；缺点是架构复杂，运维成本高。</li>
-<li>kappa架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210820054517606.png"><br>kappa架构是由LinkedIn的Jay Kreps提出的（参考paper: <a target="_blank" rel="noopener" href="https://www.oreilly.com/radar/questioning-the-lambda-architecture/">https://www.oreilly.com/radar/questioning-the-lambda-architecture/</a> ），作为lambda方案的一个简化版，它移除了离线生产链路，思路是通过在kafka里保存全量历史数据，当需要历史计算的时候，就启动一个任务从头开始消费数据。优点是架构相对简化，数据来源单一，共用一套代码，开发效率高；缺点是必须要求消息队列中保存了存量数据，而且主要业务逻辑在计算层，比较消耗内存计算资源。<br>但由于之前流处理系统本身不成熟，对窗口计算，事件时间，乱序问题和SQL支持上的不成熟，导致大部分公司普遍采用了lambda架构方案。但自从2020年2月11日，flink发布了1.10以及随后的1.11版本，引入了blink planner和hive集成极大的增强了在SQL和流批一体支持上，这为真正实现kappa架构带来了一丝希望。</li>
+<li>kappa架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210820054517606.png"><br>kappa架构是由LinkedIn的Jay Kreps提出的（参考paper: <a target="_blank" rel="noopener" href="https://www.oreilly.com/radar/questioning-the-lambda-architecture/">https://www.oreilly.com/radar/questioning-the-lambda-architecture/</a> ），作为lambda方案的一个简化版，它移除了离线生产链路，思路是通过在kafka里保存全量历史数据，当需要历史计算的时候，就启动一个任务从头开始消费数据。优点是架构相对简化，数据来源单一，共用一套代码，开发效率高；缺点是必须要求消息队列中保存了存量数据，而且主要业务逻辑在计算层，比较消耗内存计算资源。<br>但由于之前流处理系统本身不成熟，对窗口计算，事件时间，乱序问题和SQL支持上的不成熟，导致大部分公司普遍采用lambda架构方案。但自从2020年2月11日，flink发布了1.10以及随后的1.11版本，引入了blink planner和hive集成极大的增强了对于SQL和流批一体支持上，这为真正实现kappa架构带来了一丝希望。</li>
 </ol>
-<h5 id="准实时数仓方案："><a href="#准实时数仓方案：" class="headerlink" title="准实时数仓方案："></a>准实时数仓方案：</h5><p><img src="/base-doris-olap-realtime-dw-in-xdf/20210819082651546.png"><br>其核心思路是，采用olap引擎来解决聚合计算和明显数据查询问题，配合分钟级别调度（一般是30或者15分钟）能力来支持业务实时数据需求。这个架构优点是： </p>
+<h5 id="准实时数仓方案："><a href="#准实时数仓方案：" class="headerlink" title="准实时数仓方案："></a>准实时数仓方案：</h5><p><img src="/base-doris-olap-realtime-dw-in-xdf/20210819082651546.png"><br>其核心思路是，采用olap引擎来解决聚合计算和明细数据查询问题，配合分钟级别调度（一般是30或者15分钟）能力来支持业务实时数据需求。<br>**该架构优点是： **</p>
 <ul>
-<li>一般olap引擎都对SQL支持度很好，开发成本极低 少量人员都可以支持复杂的业务需求，灵活应对业务变化。对于差钱的公司来说无疑非常节约成本的（财大气粗的公司除外）</li>
+<li>一般olap引擎都对SQL的支持度很好，开发成本极低 少量人员都可以支持复杂的业务需求，灵活应对业务变化。对于差钱的公司来说无疑非常节约成本的（财大气粗的公司除外）</li>
 <li>对于数据修复成本低，因为可以基于一个周期内的数据进行全量计算，所以修复数据只需要重跑任务即可。</li>
 <li>对于运维成本也较低，只需要监控任务运行成功失败即可</li>
-<li>对于数据时效性要求极高的场景，配合flink实时计算能力，在数据接入的时候进行部分聚合计算在把结果写入olap引擎，不需要再配合调度计算，已此来到达秒级延迟。<br>该架构的缺点是：</li>
-<li>将计算转移到了olap引擎并同时兼顾了计算和查询需求，对olap引擎性能有较高的要求</li>
-<li>因为计算转移到了olap端，所以这种方案适用的数据体量规模有限制</li>
+<li>对于数据时效性要求较高的场景，配合flink实时计算能力，在数据接入的时候进行部分聚合计算，之后再把结果写入olap引擎，不需要再配合调度计算，已此来到达秒级延迟。  </li>
 </ul>
-<h4 id="基于doris的准实时方案"><a href="#基于doris的准实时方案" class="headerlink" title="基于doris的准实时方案"></a>基于doris的准实时方案</h4><p>结合公司数据规模，业务灵活性，成本方面的考虑我们选用的准实时的方案。那么接下来的就是确定采用什么olap引擎的问题了，目前业界开源的olap引擎主要有:clickhouse,durid,doris,impala+kudu,presto<br>这些引擎目前业界都有公司采用，比如：头条采clickhouse(因为头条数据量巨大，并且头条专门有一个团队来优化和改进clickhouse内核，有钱就是好)，快手采用durid,doris美团/作业帮有采用，impala+kudu网易是深度用户，presto主要用做adhoc查询。<br>对此可以看到，这些引擎都可以采用主要问题是，是否对这些引擎有足够的掌握程度以及引擎本身学习成本。经过一番对比以及之前本身对doris有一定的了解和横行对比使用的公司的规模，最后选择了doris引擎。<br>doris的优点如下：</p>
+<p><strong>该架构的缺点是：</strong></p>
+<ul>
+<li>将计算转移到了olap引擎并同时兼顾了计算和查询需求，对olap引擎性能有较高的要求</li>
+<li>因为计算转移到了olap端，所以这种方案适用的数据体量规模有一定限制</li>
+</ul>
+<h4 id="基于doris的准实时方案"><a href="#基于doris的准实时方案" class="headerlink" title="基于doris的准实时方案"></a>基于doris的准实时方案</h4><p>结合公司数据规模，业务灵活性，成本方面的考虑我们选用的准实时的方案。那么接下来的就是确定采用什么olap引擎的问题了，目前业界开源的olap引擎主要有:clickhouse,durid,doris,impala+kudu,presto<br>这些引擎目前业界都有公司采用，比如：头条采用clickhouse(因为头条数据量巨大，并且头条专门有一个团队来优化和改进clickhouse的内核，有钱就是好)，快手采用durid,doris美团/作业帮有采用，impala+kudu网易是深度用户，presto主要用做adhoc查询。<br>对此可以看到，这些引擎都可以采用主要问题是，是否对这些引擎有足够的掌握程度以及引擎本身学习成本。经过一番对比以及之前本身对doris有一定的了解和横向对比使用的公司的规模，最后选择了doris引擎。<br>doris的优点如下：</p>
 <ul>
 <li>单表和多表join查询性能都很强，可以同时较好支持宽表查询场景和复杂多表查询，灵活性高</li>
 <li>支持实时数据更新操作</li>
@@ -260,7 +275,7 @@
 </ol>
 <h5 id="使用doris遇到的一些问题"><a href="#使用doris遇到的一些问题" class="headerlink" title="使用doris遇到的一些问题"></a>使用doris遇到的一些问题</h5><p>在实际业务应用中也遇到了一些问题，主要有如下几个方面的问题</p>
 <ol>
-<li>socket文件描述符泄漏问题<br>因为进行查询和ETL都需要通过JDBC或MYSQL客户端与fe的9030端口连接，在测试使用0.10版本时发现有的socket的文件描述符没有办法正常关闭，每小时都会产生几十个fd泄露，最后达到上限无法创建新的socket连接，只能通过重启的方式释放掉关闭异常的fd。<br>经过排查所有相关连接使用的代码，发现并没有可能产生连接不关闭的部分，咨询发现其他doris使用者并没有出现过类似问题，经过反复和社区沟通最终确定是MysqlNoiServer的bug。</li>
+<li>socket文件描述符泄漏问题<br>因为进行查询和ETL都需要通过JDBC或MYSQL客户端与fe的9030端口连接，在测试使用0.10版本时发现有的socket的文件描述符没有办法正常关闭，每小时都会产生几十个fd泄露，最后达到上限无法创建新的socket连接，只能通过重启的方式释放掉关闭异常的fd。<br>经过排查所有相关连接使用的代码，发现并没有可能产生连接不关闭的部分，咨询发现其他doris使用者并没有出现过类似问题，经过反复和社区沟通最终确定是MysqlNIOServer的bug，目前已经修复。</li>
 <li>语法相关问题<ul>
 <li>union all null值问题<br>在使用with语句生成的虚拟临时表时，如果有值为null的字段，这个字段在后续使用时的值会变成空字符串，不论是直接插入表还是通过not null进行过滤都无法得到正确结果。  </li>
 <li>常量值join时会关联出错误数据<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210820061524659.png"><br>如果with查询中使用了case when等对字段进行常量值赋值的情况，如果join关联时的关联条件使用到了这个字段，则有可能出现错误关联的情况，例如无法关联上的数据错误的关联上了。</li>
@@ -539,6 +554,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">apache</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
@@ -547,7 +566,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">apache</a>
+                <a href="javascript:void(0)" class="js-tag color3">事物</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -563,15 +586,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事物</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">jackson</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -595,23 +614,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">jackson</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">flink</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">分布式事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -648,6 +655,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">mysql-replication</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">分布式事务</a>
               </li>
              
               <li class="article-tag-list-item">
