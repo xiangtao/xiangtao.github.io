@@ -191,9 +191,11 @@
   
 
         
-        <a href="/2020/03/12/etl-system-desc/" class="archive-article-date">
+        
+<a href="/2020/03/12/etl-system-desc/" class="archive-article-date">
   	<time datetime="2020-03-12T04:12:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-12</time>
 </a>
+
         
       </header>
     
@@ -283,9 +285,11 @@
   
 
         
-        <a href="/2020/03/08/mysql-transaction-deep-defination/" class="archive-article-date">
+        
+<a href="/2020/03/08/mysql-transaction-deep-defination/" class="archive-article-date">
   	<time datetime="2020-03-08T08:42:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-08</time>
 </a>
+
         
       </header>
     
@@ -363,9 +367,11 @@
   
 
         
-        <a href="/2020/03/08/consistency-send-mq-whith-writing-database/" class="archive-article-date">
+        
+<a href="/2020/03/08/consistency-send-mq-whith-writing-database/" class="archive-article-date">
   	<time datetime="2020-03-08T03:53:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-08</time>
 </a>
+
         
       </header>
     
@@ -431,108 +437,6 @@
 
 
   
-    <article id="post-mysql-query-choice-index" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/02/mysql-query-choice-index/">mysql查询是怎么选择索引的？</a>
-    </h1>
-  
-
-        
-        <a href="/2020/03/02/mysql-query-choice-index/" class="archive-article-date">
-  	<time datetime="2020-03-02T08:32:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h5 id="表结构"><a href="#表结构" class="headerlink" title="表结构"></a>表结构</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `scheduler_task_tracker` (</span><br><span class="line">  `id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  `task_id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_start_time` datetime <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_status` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_end_time` datetime <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `scheduler_node` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `client_node` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `is_execute_notify` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `partition_code` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `is_del` <span class="type">smallint</span>(<span class="number">6</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_name` <span class="type">varchar</span>(<span class="number">500</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `user_id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (`id`),</span><br><span class="line">  KEY `task_start_time_ind` (`task_start_time`),</span><br><span class="line">  KEY `task_end_time_ind` (`task_end_time`),</span><br><span class="line">  KEY `task_name_ind` (`task_name`(<span class="number">255</span>)) <span class="keyword">USING</span> BTREE,</span><br><span class="line">  KEY `task_id_partition_code_ind` (`task_id`,`partition_code`)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB AUTO_INCREMENT<span class="operator">=</span><span class="number">21614019</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h5 id="索引信息"><a href="#索引信息" class="headerlink" title="索引信息"></a>索引信息</h5><p><img src="/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/20200302045610625.png"><br>task_start_time的Cardinality： 3453770<br>task_end_time的Cardinality：   6907541</p>
-<h5 id="查询SQL"><a href="#查询SQL" class="headerlink" title="查询SQL"></a>查询SQL</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">explain </span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">			id <span class="keyword">AS</span> taskTrackerID,</span><br><span class="line">			task_id <span class="keyword">AS</span> taskInstanceId,</span><br><span class="line">			task_start_time <span class="keyword">AS</span> taskStartTime,</span><br><span class="line">			is_debug <span class="keyword">AS</span> isDebug,</span><br><span class="line">			task_status <span class="keyword">AS</span> taskStatus,</span><br><span class="line">			task_progress <span class="keyword">AS</span> taskProgress,</span><br><span class="line">			task_end_time <span class="keyword">AS</span> taskEndTime,</span><br><span class="line">			scheduler_node <span class="keyword">AS</span> schedulerNode,</span><br><span class="line">			is_del <span class="keyword">AS</span> isDel,</span><br><span class="line">			client_node <span class="keyword">AS</span> clientNode,</span><br><span class="line">			user_id <span class="keyword">AS</span> userId,</span><br><span class="line">			partition_code <span class="keyword">AS</span> partitionCode,</span><br><span class="line">			task_name <span class="keyword">AS</span> taskName</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			scheduler_task_tracker</span><br><span class="line">		<span class="keyword">WHERE</span></span><br><span class="line">	task_status <span class="operator">=</span> <span class="number">6</span></span><br><span class="line">    <span class="keyword">and</span> task_name <span class="keyword">LIKE</span> <span class="string">&#x27;%rpt_c2c_sell_vr_report_di%&#x27;</span> </span><br><span class="line">    <span class="keyword">and</span> task_start_time <span class="operator">&gt;=</span><span class="string">&#x27;2020-03-01 00:00:00&#x27;</span> </span><br><span class="line">    <span class="keyword">and</span> task_end_time<span class="operator">&lt;=</span><span class="string">&#x27;2020-03-02 23:59:59&#x27;</span> </span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span>  task_start_time <span class="keyword">asc</span> </span><br><span class="line">    limit <span class="number">0</span>, <span class="number">10</span></span><br></pre></td></tr></table></figure>
-<ol>
-<li><p>查询按照 task_start_time 排序，走索引’task_start_time_ind’ 扫描：78462行，较快<br><img src="/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/20200302044049215.png"></p>
-</li>
-<li><p>查询按照 task_end_time 排序，走索引’task_end_time_ind’ 扫描：3454055行 ，比较慢<br><img src="/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/20200302044339710.png"></p>
-</li>
-</ol>
-<p>分析如下： </p>
-<ul>
-<li>task_name 有索引但用了 like 不走这个索引</li>
-<li>因为有了排序 1，2 查询都按照排序字段上的索引来查询</li>
-<li>task_end_time基数太大所以扫描的行数多，查询慢</li>
-</ul>
-<p>怎么使得第二个查询变快呢？</p>
-<ul>
-<li>可以建立task_start_time和task_end_time的联合查询 </li>
-</ul>
-<p>mysql主要根据优化器来判断使用那个索引还是使用全表扫描</p>
-<ul>
-<li>优化器优化判断的指标<br>需要扫描的行数，是否使用临时表，是否排序等因素来计数查询的成本</li>
-<li>扫描行数判断<br>那么优化器是怎么获取扫描的总行数的，其实就和抽样检查类似，因为索引是有序的，就可以使用采样统计这种算法算出大概的扫描行数，可以通过show index查看索引的Cardinality预估值。</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">索引</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/02/mysql-query-choice-index/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-mysql-查询索引选择" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -545,9 +449,11 @@
   
 
         
-        <a href="/2020/03/02/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/" class="archive-article-date">
+        
+<a href="/2020/03/02/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/" class="archive-article-date">
   	<time datetime="2020-03-02T08:32:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-02</time>
 </a>
+
         
       </header>
     
@@ -635,6 +541,110 @@
 
 
   
+    <article id="post-mysql-query-choice-index" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/02/mysql-query-choice-index/">mysql查询是怎么选择索引的？</a>
+    </h1>
+  
+
+        
+        
+<a href="/2020/03/02/mysql-query-choice-index/" class="archive-article-date">
+  	<time datetime="2020-03-02T08:32:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-02</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="表结构"><a href="#表结构" class="headerlink" title="表结构"></a>表结构</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `scheduler_task_tracker` (</span><br><span class="line">  `id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  `task_id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_start_time` datetime <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_status` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_end_time` datetime <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `scheduler_node` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `client_node` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `is_execute_notify` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `partition_code` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `is_del` <span class="type">smallint</span>(<span class="number">6</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_name` <span class="type">varchar</span>(<span class="number">500</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `user_id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (`id`),</span><br><span class="line">  KEY `task_start_time_ind` (`task_start_time`),</span><br><span class="line">  KEY `task_end_time_ind` (`task_end_time`),</span><br><span class="line">  KEY `task_name_ind` (`task_name`(<span class="number">255</span>)) <span class="keyword">USING</span> BTREE,</span><br><span class="line">  KEY `task_id_partition_code_ind` (`task_id`,`partition_code`)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB AUTO_INCREMENT<span class="operator">=</span><span class="number">21614019</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="索引信息"><a href="#索引信息" class="headerlink" title="索引信息"></a>索引信息</h5><p><img src="/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/20200302045610625.png"><br>task_start_time的Cardinality： 3453770<br>task_end_time的Cardinality：   6907541</p>
+<h5 id="查询SQL"><a href="#查询SQL" class="headerlink" title="查询SQL"></a>查询SQL</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">explain </span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">			id <span class="keyword">AS</span> taskTrackerID,</span><br><span class="line">			task_id <span class="keyword">AS</span> taskInstanceId,</span><br><span class="line">			task_start_time <span class="keyword">AS</span> taskStartTime,</span><br><span class="line">			is_debug <span class="keyword">AS</span> isDebug,</span><br><span class="line">			task_status <span class="keyword">AS</span> taskStatus,</span><br><span class="line">			task_progress <span class="keyword">AS</span> taskProgress,</span><br><span class="line">			task_end_time <span class="keyword">AS</span> taskEndTime,</span><br><span class="line">			scheduler_node <span class="keyword">AS</span> schedulerNode,</span><br><span class="line">			is_del <span class="keyword">AS</span> isDel,</span><br><span class="line">			client_node <span class="keyword">AS</span> clientNode,</span><br><span class="line">			user_id <span class="keyword">AS</span> userId,</span><br><span class="line">			partition_code <span class="keyword">AS</span> partitionCode,</span><br><span class="line">			task_name <span class="keyword">AS</span> taskName</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			scheduler_task_tracker</span><br><span class="line">		<span class="keyword">WHERE</span></span><br><span class="line">	task_status <span class="operator">=</span> <span class="number">6</span></span><br><span class="line">    <span class="keyword">and</span> task_name <span class="keyword">LIKE</span> <span class="string">&#x27;%rpt_c2c_sell_vr_report_di%&#x27;</span> </span><br><span class="line">    <span class="keyword">and</span> task_start_time <span class="operator">&gt;=</span><span class="string">&#x27;2020-03-01 00:00:00&#x27;</span> </span><br><span class="line">    <span class="keyword">and</span> task_end_time<span class="operator">&lt;=</span><span class="string">&#x27;2020-03-02 23:59:59&#x27;</span> </span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span>  task_start_time <span class="keyword">asc</span> </span><br><span class="line">    limit <span class="number">0</span>, <span class="number">10</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>查询按照 task_start_time 排序，走索引’task_start_time_ind’ 扫描：78462行，较快<br><img src="/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/20200302044049215.png"></p>
+</li>
+<li><p>查询按照 task_end_time 排序，走索引’task_end_time_ind’ 扫描：3454055行 ，比较慢<br><img src="/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/20200302044339710.png"></p>
+</li>
+</ol>
+<p>分析如下： </p>
+<ul>
+<li>task_name 有索引但用了 like 不走这个索引</li>
+<li>因为有了排序 1，2 查询都按照排序字段上的索引来查询</li>
+<li>task_end_time基数太大所以扫描的行数多，查询慢</li>
+</ul>
+<p>怎么使得第二个查询变快呢？</p>
+<ul>
+<li>可以建立task_start_time和task_end_time的联合查询 </li>
+</ul>
+<p>mysql主要根据优化器来判断使用那个索引还是使用全表扫描</p>
+<ul>
+<li>优化器优化判断的指标<br>需要扫描的行数，是否使用临时表，是否排序等因素来计数查询的成本</li>
+<li>扫描行数判断<br>那么优化器是怎么获取扫描的总行数的，其实就和抽样检查类似，因为索引是有序的，就可以使用采样统计这种算法算出大概的扫描行数，可以通过show index查看索引的Cardinality预估值。</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">索引</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/03/02/mysql-query-choice-index/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-from-0-to-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -647,9 +657,11 @@
   
 
         
-        <a href="/2020/03/01/from-0-to-1/" class="archive-article-date">
+        
+<a href="/2020/03/01/from-0-to-1/" class="archive-article-date">
   	<time datetime="2020-03-01T14:06:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-01</time>
 </a>
+
         
       </header>
     
@@ -735,9 +747,11 @@
   
 
         
-        <a href="/2020/02/26/fastjson-so-quickly-why-also-like-use-jackson/" class="archive-article-date">
+        
+<a href="/2020/02/26/fastjson-so-quickly-why-also-like-use-jackson/" class="archive-article-date">
   	<time datetime="2020-02-26T07:58:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-26</time>
 </a>
+
         
       </header>
     
@@ -815,9 +829,11 @@
   
 
         
-        <a href="/2020/02/20/how-did-connection-hbase/" class="archive-article-date">
+        
+<a href="/2020/02/20/how-did-connection-hbase/" class="archive-article-date">
   	<time datetime="2020-02-20T09:25:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-20</time>
 </a>
+
         
       </header>
     
@@ -891,9 +907,11 @@
   
 
         
-        <a href="/2020/02/19/hbase-row-transaction-model/" class="archive-article-date">
+        
+<a href="/2020/02/19/hbase-row-transaction-model/" class="archive-article-date">
   	<time datetime="2020-02-19T12:58:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-19</time>
 </a>
+
         
       </header>
     
@@ -975,9 +993,11 @@
   
 
         
-        <a href="/2020/02/16/hbase-meta/" class="archive-article-date">
+        
+<a href="/2020/02/16/hbase-meta/" class="archive-article-date">
   	<time datetime="2020-02-16T14:09:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-16</time>
 </a>
+
         
       </header>
     
@@ -1071,7 +1091,19 @@
       	</div>
     </div>
   </div>
+  
+        <!-- 不蒜子统计 -->
+        <span id="busuanzi_container_site_pv">
+                本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                本站访客数<span id="busuanzi_value_site_uv"></span>人
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
 </footer>
+
     </div>
     <script>
 	var yiliaConfig = {
@@ -1147,10 +1179,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">apache</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
@@ -1159,11 +1187,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事物</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
+                <a href="javascript:void(0)" class="js-tag color2">apache</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1180,6 +1204,22 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">flink</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">事物</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1207,15 +1247,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">flink</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">realtime-platform</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">分布式事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1251,23 +1291,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">分布式事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">索引</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
               </li>
              
               <li class="article-tag-list-item">
