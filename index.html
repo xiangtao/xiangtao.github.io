@@ -179,6 +179,196 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-debezium-sourcecode" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/27/debezium-sourcecode/">【debezium源码分析】-启动流程</a>
+    </h1>
+  
+
+        
+        
+<a href="/2021/08/27/debezium-sourcecode/" class="archive-article-date">
+  	<time datetime="2021-08-27T03:47:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-27</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h3><p>先上一张流程图：<br><img src="/debezium-sourcecode/20210827062243887.png"></p>
+<p>从MysqlConnector开始启动，再调MySqlConnectorTask的start方法，MySqlConnectorTask启动的时候，会先判断是否有从之前记录的offset启动，来决定是否需要开启snapshot阶段</p>
+        
+          <a class="article-more-a" href="/2021/08/27/debezium-sourcecode/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">debezium</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/27/debezium-sourcecode/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-binlog" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/26/binlog/">binlog事件数据结构</a>
+    </h1>
+  
+
+        
+        
+<a href="/2021/08/26/binlog/" class="archive-article-date">
+  	<time datetime="2021-08-26T06:44:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-26</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="binlog事件数据结构"><a href="#binlog事件数据结构" class="headerlink" title="binlog事件数据结构"></a>binlog事件数据结构</h3><ul>
+<li>TABLE_MAP <blockquote>
+<p>row格式的binlog文件中，每个ROW_EVENT之前都有一个TABLE_MAP_EVENT，用于描述该更新的元数据信息，记录包括，tableId, database,table,columnTypes等</p>
+</blockquote>
+</li>
+</ul>
+<p>结构如下： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:TABLE_MAP</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629959676000, eventType&#x3D;TABLE_MAP, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;35, nextPosition&#x3D;9806, flags&#x3D;0&#125;</span><br><span class="line">data:TableMapEventData&#123;tableId&#x3D;1447, database&#x3D;&#39;flink_sql&#39;, table&#x3D;&#39;xx&#39;, columnTypes&#x3D;3, 15, 3, columnMetadata&#x3D;0, 180, 0, columnNullability&#x3D;&#123;1, 2&#125;, eventMetadata&#x3D;null&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li> EXT_UPDATE_ROWS <blockquote>
+<p>update操作事件，记录tableId，includedColumnsBeforeUpdate（更新之前列位置），includedColumns（更新后的列位置），before（更新之前的数据），after（更新之后的数据）。不包括列名信息</p>
+</blockquote>
+</li>
+</ul>
+<p>结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629959676000, eventType&#x3D;EXT_UPDATE_ROWS, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;45, nextPosition&#x3D;9986, flags&#x3D;0&#125;</span><br><span class="line">data:UpdateRowsEventData&#123;tableId&#x3D;1447, includedColumnsBeforeUpdate&#x3D;&#123;0, 1, 2&#125;, includedColumns&#x3D;&#123;0, 1, 2&#125;, rows&#x3D;[</span><br><span class="line">    &#123;before&#x3D;[4, ssxx11, null], after&#x3D;[4, ssxx11, 3]&#125;</span><br><span class="line">]&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>EXT_WRITE_ROWS<blockquote>
+<p>insert操作事件，包括：tableId，includedColumns（列位置信息），rows（插入的行信息）</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:EXT_WRITE_ROWS</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629961329000, eventType&#x3D;EXT_WRITE_ROWS, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;27, nextPosition&#x3D;10788, flags&#x3D;0&#125;</span><br><span class="line">data:WriteRowsEventData&#123;tableId&#x3D;1448, includedColumns&#x3D;&#123;0, 1, 2&#125;, rows&#x3D;[</span><br><span class="line">    [5, xxx, b]</span><br><span class="line">]&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>EXT_DELETE_ROWS<blockquote>
+<p>delete操作事件类型,包括tableId，includedColumns（列位置），rows（行数据）</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:EXT_DELETE_ROWS</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629962064000, eventType&#x3D;EXT_DELETE_ROWS, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;27, nextPosition&#x3D;11063, flags&#x3D;0&#125;</span><br><span class="line">data:DeleteRowsEventData&#123;tableId&#x3D;1448, includedColumns&#x3D;&#123;0, 1, 2&#125;, rows&#x3D;[</span><br><span class="line">    [5, xxx, b]</span><br><span class="line">]&#125;</span><br><span class="line">DeleteRowsEventData&#123;tableId&#x3D;1448, includedColumns&#x3D;&#123;0, 1, 2&#125;, rows&#x3D;[</span><br><span class="line">    [5, xxx, b]</span><br><span class="line">]&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>QUERY <blockquote>
+<p>QUERY_EVENT事件以文本的形式记录信息,所有DDL操作以文本的形式记录在该事件中 </p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:QUERY</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629961045000, eventType&#x3D;QUERY, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;150, nextPosition&#x3D;10251, flags&#x3D;0&#125;</span><br><span class="line">data:QueryEventData&#123;threadId&#x3D;3, executionTime&#x3D;0, errorCode&#x3D;0, database&#x3D;&#39;flink_sql&#39;, sql&#x3D;&#39;ALTER TABLE &#96;flink_sql&#96;.&#96;xx&#96; </span><br><span class="line">CHANGE COLUMN &#96;age&#96; &#96;age&#96; VARCHAR(10) NULL DEFAULT NULL&#39;&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/26/binlog/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-base-doris-olap-realtime-dw-in-xdf" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -960,164 +1150,6 @@
 
 
   
-    <article id="post-enterpise-datawarehouse-" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/23/enterpise-datawarehouse-/">how-to-build-enterpise-bigdata-datawarehouse</a>
-    </h1>
-  
-
-        
-        
-<a href="/2020/03/23/enterpise-datawarehouse-/" class="archive-article-date">
-  	<time datetime="2020-03-23T15:29:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-23</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文根据阿里云高级技术专家李金波在首届阿里巴巴在线峰会的《企业大数据平台仓库架构建设思路》的分享整理而成。随着互联网规模不断的扩大，数据也在爆炸式地增长，各种结构化、半结构化、非结构化数据的产生，越来越多的企业开始在大数据平台下进行数据处理。分享中，李金波主要从总体思路、模型设计、数加架构、数据治理四个方面介绍了如何利用大数据平台的特性，构建更贴合大数据应用的数据仓库。</p>
-        
-          <a class="article-more-a" href="/2020/03/23/enterpise-datawarehouse-/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">数据仓库</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/23/enterpise-datawarehouse-/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-how-size-db-connection-poll" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/23/how-size-db-connection-poll/">数据库连接池到底应该设多大？</a>
-    </h1>
-  
-
-        
-        
-<a href="/2020/03/23/how-size-db-connection-poll/" class="archive-article-date">
-  	<time datetime="2020-03-23T15:03:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-23</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>我在研究HikariCP（一个数据库连接池）时无意间在HikariCP的Github wiki上看到了一篇文章（<a target="_blank" rel="noopener" href="https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing">https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing</a> ），这篇文章有力地消除了我一直以来的疑虑，看完之后感觉神清气爽。故在此做译文分享。</p>
-<p>接下来是正文</p>
-<p>数据库连接池的配置是开发者们常常搞出坑的地方，在配置数据库连接池时，有几个可以说是和直觉背道而驰的原则需要明确。</p>
-        
-          <a class="article-more-a" href="/2020/03/23/how-size-db-connection-poll/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">数据库连接池</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/23/how-size-db-connection-poll/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1227,15 +1259,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">apache</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">apache</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1251,23 +1283,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">flink</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">事物</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">flink</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1292,6 +1324,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">调度系统</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">flink cdc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1343,11 +1379,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">
