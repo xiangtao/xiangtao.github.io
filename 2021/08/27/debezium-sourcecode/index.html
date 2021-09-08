@@ -8,16 +8,16 @@
   <link rel="dns-prefetch" href="https://herden.gitee.io">
   <title>【debezium源码分析】-启动流程 | taox的博客|开发者驿站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="启动流程先上一张流程图： 从MysqlConnector开始启动，再调MySqlConnectorTask的start方法，MySqlConnectorTask启动的时候，会先判断是否有从之前记录的offset启动，来决定是否需要开启snapshot阶段">
+  <meta name="description" content="启动流程上一篇讲了debezium整个架构流程，这篇文件讲一下具体启动的细节。    先上一张流程图：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【debezium源码分析】-启动流程">
 <meta property="og:url" content="https://herden.gitee.io/2021/08/27/debezium-sourcecode/index.html">
 <meta property="og:site_name" content="taox的博客|开发者驿站">
-<meta property="og:description" content="启动流程先上一张流程图： 从MysqlConnector开始启动，再调MySqlConnectorTask的start方法，MySqlConnectorTask启动的时候，会先判断是否有从之前记录的offset启动，来决定是否需要开启snapshot阶段">
+<meta property="og:description" content="启动流程上一篇讲了debezium整个架构流程，这篇文件讲一下具体启动的细节。    先上一张流程图：">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://herden.gitee.io/debezium-sourcecode/20210827062243887.png">
 <meta property="article:published_time" content="2021-08-27T03:47:51.000Z">
-<meta property="article:modified_time" content="2021-08-27T10:27:54.790Z">
+<meta property="article:modified_time" content="2021-09-08T06:15:04.674Z">
 <meta property="article:author" content="taox">
 <meta property="article:tag" content="debezium">
 <meta property="article:tag" content="flink">
@@ -211,9 +211,13 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h3><p>先上一张流程图：<br><img src="/debezium-sourcecode/20210827062243887.png"></p>
-<p>从MysqlConnector开始启动，再调MySqlConnectorTask的start方法，MySqlConnectorTask启动的时候，会先判断是否有从之前记录的offset启动，来决定是否需要开启snapshot阶段</p>
+        <h3 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h3><p>上一篇讲了debezium整个架构流程，这篇文件讲一下具体启动的细节。   </p>
+<p><strong>先上一张流程图：</strong>  </p>
+<p><img src="/debezium-sourcecode/20210827062243887.png">  </p>
 <span id="more"></span>
+
+<p>从MysqlConnector开始启动，再调MySqlConnectorTask的start方法，MySqlConnectorTask启动的时候，会先判断是否有从之前记录的offset启动，来决定是否需要开启snapshot阶段</p>
+<!-- more -->
 
 <ul>
 <li>如果从offset启动：<ul>
@@ -349,6 +353,15 @@
 
   
 <nav id="article-nav">
+  
+    <a href="/2021/08/29/debezium-sourcecode-plugin-architecture/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          【debezium源码分析】-插件架构
+        
+      </div>
+    </a>
   
   
     <a href="/2021/08/26/binlog/" id="article-nav-older" class="article-nav-link-wrap">
@@ -520,15 +533,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">apache</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">apache</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -544,11 +557,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事物</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
+                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -556,7 +565,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
+                <a href="javascript:void(0)" class="js-tag color3">事物</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -640,11 +653,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
               </li>
              
               <li class="article-tag-list-item">

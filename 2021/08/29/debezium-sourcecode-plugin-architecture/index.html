@@ -6,20 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://herden.gitee.io">
-  <title>hbase meta表介绍 | taox的博客|开发者驿站</title>
+  <title>【debezium源码分析】-插件架构 | taox的博客|开发者驿站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="在hbase0.98之前hbase元数据表有两个：ROOT表与meta表。在hbase0.98之后，hbase就废弃了ROOT表，仅保留meta并且该表不允许split,所以只有一个Region。 meta表位置meta表保存了集群中所有region的位置信息，当我们通过客户端put,get,delete等操作数据的时候，首先会去这个表里查找该数据所在的regionserver位置。但是 meta">
+  <meta name="description" content="背景本文主要是从全局角度来分析debezium的插件架构特性，帮助大家对debezium有一个宏观的了解。 架构debezium的使用方式目前有3种形式：  部署作为一个kafka connector in Kafka Connect cluster  部署在Debezium Server里 作为一个embedded engine 在自己的应用里    本文主要讨论作为embedded engin">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hbase meta表介绍">
-<meta property="og:url" content="https://herden.gitee.io/2020/02/16/hbase-meta/index.html">
+<meta property="og:title" content="【debezium源码分析】-插件架构">
+<meta property="og:url" content="https://herden.gitee.io/2021/08/29/debezium-sourcecode-plugin-architecture/index.html">
 <meta property="og:site_name" content="taox的博客|开发者驿站">
-<meta property="og:description" content="在hbase0.98之前hbase元数据表有两个：ROOT表与meta表。在hbase0.98之后，hbase就废弃了ROOT表，仅保留meta并且该表不允许split,所以只有一个Region。 meta表位置meta表保存了集群中所有region的位置信息，当我们通过客户端put,get,delete等操作数据的时候，首先会去这个表里查找该数据所在的regionserver位置。但是 meta">
+<meta property="og:description" content="背景本文主要是从全局角度来分析debezium的插件架构特性，帮助大家对debezium有一个宏观的了解。 架构debezium的使用方式目前有3种形式：  部署作为一个kafka connector in Kafka Connect cluster  部署在Debezium Server里 作为一个embedded engine 在自己的应用里    本文主要讨论作为embedded engin">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-02-16T14:09:48.000Z">
-<meta property="article:modified_time" content="2021-02-26T08:31:51.854Z">
+<meta property="article:published_time" content="2021-08-29T03:34:38.000Z">
+<meta property="article:modified_time" content="2021-09-08T06:14:40.352Z">
 <meta property="article:author" content="taox">
-<meta property="article:tag" content="habse">
-<meta property="article:tag" content="大数据">
+<meta property="article:tag" content="debezium">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="taox的博客|开发者驿站" type="application/atom+xml">
@@ -182,14 +181,14 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-hbase-meta" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-debezium-sourcecode-plugin-architecture" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      hbase meta表介绍
+      【debezium源码分析】-插件架构
     </h1>
   
 
@@ -200,8 +199,8 @@
               <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
         </span>
 
-<a href="/2020/02/16/hbase-meta/" class="archive-article-date">
-  	<time datetime="2020-02-16T14:09:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-16</time>
+<a href="/2021/08/29/debezium-sourcecode-plugin-architecture/" class="archive-article-date">
+  	<time datetime="2021-08-29T03:34:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-29</time>
 </a>
 
         
@@ -209,16 +208,29 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在hbase0.98之前hbase元数据表有两个：ROOT表与meta表。在hbase0.98之后，hbase就废弃了ROOT表，仅保留meta并且该表不允许split,所以只有一个Region。</p>
-<h3 id="meta表位置"><a href="#meta表位置" class="headerlink" title="meta表位置"></a>meta表位置</h3><p>meta表保存了集群中所有region的位置信息，当我们通过客户端put,get,delete等操作数据的时候，首先会去这个表里查找该数据所在的regionserver位置。<br>但是 meta表也是一个hbase表，那怎么找个表的regionserver呢？答案时：通过zookeeper。<br>    hbsse把meta表的region信息保存到了zookeeper里，对应路径为：/hbase/meta-region-server</p>
-<h3 id="meta表结构信息"><a href="#meta表结构信息" class="headerlink" title="meta表结构信息"></a>meta表结构信息</h3><p>rowkey为：**<em>表名,该region的startKey,创建时间.hash值**</em>。<br>其中：hash值为：MD5Hash.getMD5AsHex(byte(表名,该region的startKey,创建时间))<br>如果当前region为table的第一个region时，region startKey=null</p>
-<p>meta表只有一个列簇info，并且包含四列：</p>
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>本文主要是从全局角度来分析debezium的插件架构特性，帮助大家对debezium有一个宏观的了解。</p>
+<h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>debezium的使用方式目前有3种形式：</p>
 <ol>
-<li>regioninfo ：当前region的startKey与endKey，name，encode等消息</li>
-<li>seqnumDuringOpen：</li>
-<li>server：region所在服务器及端口</li>
-<li>serverstartcode：服务开始的时候的timestamp</li>
+<li>部署作为一个kafka connector in Kafka Connect cluster </li>
+<li>部署在Debezium Server里</li>
+<li>作为一个embedded engine 在自己的应用里  </li>
 </ol>
+<p>本文主要讨论作为embedded engine的时候的架构。</p>
+<p>嵌入式引擎需要实现<strong>DebeziumEngine</strong>接口，这个接口也是一个<strong>Runnable</strong>，所以它的入口方法是在run方法里。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public interface DebeziumEngine&lt;R&gt; extends Runnable, Closeable </span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+
+<p><strong>EmbeddedEngine</strong>是它的实现类。我们来看看它的run方法，首先会根据 <strong><em>connector.class</em></strong> 属性创建一个SourceConnector实例（如：MySqlConnector），接着实例化offset store实现类并启动（**<em>offset.storage**</em>配置），接着判断是否自定义了offsetCommitPolicy提交策略，没有的化初始化一个默认的策略（PeriodicCommitOffsetPolicy），接着初始化connector，在通过connector获取ConnectorTask（如：MySqlConnectorTask），初始化并启动ConnectorTask，真正执行同步的动作都在ConnectorTask类里，里面会创建根据是否需要同步快照，先启动SnapshotReader，接着启动BinlogReader，两个reader通过一个ChainedReader来组织。reader里获取的changeEvent会放入一个BlockingQueue里，之后通过task.poll()方法获取新的事件，最后回调ChangeConsumer的handle方法交给客户处理。</p>
+<p>至此，整个流程就走完了。  </p>
+<p>走起整个流程后，我发现整个代码里，有许多Listener，回调方法，比如：</p>
+<ul>
+<li>SourceConnector</li>
+<li>OffsetBackingStore</li>
+<li>offsetCommitPolicy</li>
+<li>ConnectorCallback</li>
+<li>ChangeConsumer</li>
+</ul>
+<p>这些类要么通过配置来自定义，要么通过接口实现类传入，最后通过在事件处理流程中进行回调。其实这就是我们经常听到的微内核，插件化架构，以后别人在给你吹我们的架构是微内核架构，就不用虚了。</p>
 
       
 
@@ -263,11 +275,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">habse</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">大数据</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">debezium</a>
         		</li>
       		
 		</ul>
@@ -323,7 +331,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=https://herden.gitee.io/2020/02/16/hbase-meta/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=https://herden.gitee.io/2021/08/29/debezium-sourcecode-plugin-architecture/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -337,18 +345,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/02/19/hbase-row-transaction-model/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          数据库事务系列－HBase行级事务模型
-        
-      </div>
-    </a>
   
-  
-    <a href="/2020/02/14/springboot-graceful-shutdown/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">优雅的关闭springboot应用</div>
+    <a href="/2021/08/27/debezium-sourcecode/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">【debezium源码分析】-启动流程</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -375,7 +374,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#meta%E8%A1%A8%E4%BD%8D%E7%BD%AE"><span class="toc-number">1.</span> <span class="toc-text">meta表位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#meta%E8%A1%A8%E7%BB%93%E6%9E%84%E4%BF%A1%E6%81%AF"><span class="toc-number">2.</span> <span class="toc-text">meta表结构信息</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">架构</span></a></li></ol>
                     </div>
                 </span>
             </div>

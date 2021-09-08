@@ -179,6 +179,93 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-debezium-sourcecode-plugin-architecture" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/29/debezium-sourcecode-plugin-architecture/">【debezium源码分析】-插件架构</a>
+    </h1>
+  
+
+        
+        
+<a href="/2021/08/29/debezium-sourcecode-plugin-architecture/" class="archive-article-date">
+  	<time datetime="2021-08-29T03:34:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-29</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>本文主要是从全局角度来分析debezium的插件架构特性，帮助大家对debezium有一个宏观的了解。</p>
+<h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>debezium的使用方式目前有3种形式：</p>
+<ol>
+<li>部署作为一个kafka connector in Kafka Connect cluster </li>
+<li>部署在Debezium Server里</li>
+<li>作为一个embedded engine 在自己的应用里  </li>
+</ol>
+<p>本文主要讨论作为embedded engine的时候的架构。</p>
+<p>嵌入式引擎需要实现<strong>DebeziumEngine</strong>接口，这个接口也是一个<strong>Runnable</strong>，所以它的入口方法是在run方法里。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public interface DebeziumEngine&lt;R&gt; extends Runnable, Closeable </span><br></pre></td></tr></table></figure>
+        
+          <a class="article-more-a" href="/2021/08/29/debezium-sourcecode-plugin-architecture/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">debezium</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/29/debezium-sourcecode-plugin-architecture/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-debezium-sourcecode" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -201,8 +288,9 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h3><p>先上一张流程图：<br><img src="/debezium-sourcecode/20210827062243887.png"></p>
-<p>从MysqlConnector开始启动，再调MySqlConnectorTask的start方法，MySqlConnectorTask启动的时候，会先判断是否有从之前记录的offset启动，来决定是否需要开启snapshot阶段</p>
+        <h3 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h3><p>上一篇讲了debezium整个架构流程，这篇文件讲一下具体启动的细节。   </p>
+<p><strong>先上一张流程图：</strong>  </p>
+<p><img src="/debezium-sourcecode/20210827062243887.png">  </p>
         
           <a class="article-more-a" href="/2021/08/27/debezium-sourcecode/#more">more >></a>
         
@@ -292,42 +380,9 @@
 </ul>
 <p>结构如下： </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:TABLE_MAP</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629959676000, eventType&#x3D;TABLE_MAP, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;35, nextPosition&#x3D;9806, flags&#x3D;0&#125;</span><br><span class="line">data:TableMapEventData&#123;tableId&#x3D;1447, database&#x3D;&#39;flink_sql&#39;, table&#x3D;&#39;xx&#39;, columnTypes&#x3D;3, 15, 3, columnMetadata&#x3D;0, 180, 0, columnNullability&#x3D;&#123;1, 2&#125;, eventMetadata&#x3D;null&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li> EXT_UPDATE_ROWS <blockquote>
-<p>update操作事件，记录tableId，includedColumnsBeforeUpdate（更新之前列位置），includedColumns（更新后的列位置），before（更新之前的数据），after（更新之后的数据）。不包括列名信息</p>
-</blockquote>
-</li>
-</ul>
-<p>结构如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629959676000, eventType&#x3D;EXT_UPDATE_ROWS, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;45, nextPosition&#x3D;9986, flags&#x3D;0&#125;</span><br><span class="line">data:UpdateRowsEventData&#123;tableId&#x3D;1447, includedColumnsBeforeUpdate&#x3D;&#123;0, 1, 2&#125;, includedColumns&#x3D;&#123;0, 1, 2&#125;, rows&#x3D;[</span><br><span class="line">    &#123;before&#x3D;[4, ssxx11, null], after&#x3D;[4, ssxx11, 3]&#125;</span><br><span class="line">]&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>EXT_WRITE_ROWS<blockquote>
-<p>insert操作事件，包括：tableId，includedColumns（列位置信息），rows（插入的行信息）</p>
-</blockquote>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:EXT_WRITE_ROWS</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629961329000, eventType&#x3D;EXT_WRITE_ROWS, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;27, nextPosition&#x3D;10788, flags&#x3D;0&#125;</span><br><span class="line">data:WriteRowsEventData&#123;tableId&#x3D;1448, includedColumns&#x3D;&#123;0, 1, 2&#125;, rows&#x3D;[</span><br><span class="line">    [5, xxx, b]</span><br><span class="line">]&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>EXT_DELETE_ROWS<blockquote>
-<p>delete操作事件类型,包括tableId，includedColumns（列位置），rows（行数据）</p>
-</blockquote>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:EXT_DELETE_ROWS</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629962064000, eventType&#x3D;EXT_DELETE_ROWS, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;27, nextPosition&#x3D;11063, flags&#x3D;0&#125;</span><br><span class="line">data:DeleteRowsEventData&#123;tableId&#x3D;1448, includedColumns&#x3D;&#123;0, 1, 2&#125;, rows&#x3D;[</span><br><span class="line">    [5, xxx, b]</span><br><span class="line">]&#125;</span><br><span class="line">DeleteRowsEventData&#123;tableId&#x3D;1448, includedColumns&#x3D;&#123;0, 1, 2&#125;, rows&#x3D;[</span><br><span class="line">    [5, xxx, b]</span><br><span class="line">]&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>QUERY <blockquote>
-<p>QUERY_EVENT事件以文本的形式记录信息,所有DDL操作以文本的形式记录在该事件中 </p>
-</blockquote>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:QUERY</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629961045000, eventType&#x3D;QUERY, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;150, nextPosition&#x3D;10251, flags&#x3D;0&#125;</span><br><span class="line">data:QueryEventData&#123;threadId&#x3D;3, executionTime&#x3D;0, errorCode&#x3D;0, database&#x3D;&#39;flink_sql&#39;, sql&#x3D;&#39;ALTER TABLE &#96;flink_sql&#96;.&#96;xx&#96; </span><br><span class="line">CHANGE COLUMN &#96;age&#96; &#96;age&#96; VARCHAR(10) NULL DEFAULT NULL&#39;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
+        
+          <a class="article-more-a" href="/2021/08/26/binlog/#more">more >></a>
+        
       
 
       
@@ -392,82 +447,9 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>在传统数据仓库方面，通常以T+1离线批量计算为主，按照数仓建模方式，把要处理的业务按照主题域划分，构建各种数据模型，来满足公司经营分析，财务分析等各种公司管理层的数据需求。<br>然而，随着在线教育快速发展市场竞争非常激烈，T+1的方式在某些需求上很难对业务产生实际的价值，很可能因为数据延迟导致业务动作滞后，管理要求跟进不及时，最终导致客户流失，影响公司业务发展。<br>目前我们遇到的主要痛点如下</p>
-<ul>
-<li>续费业务场景  <blockquote>
-<p>在线教育上课主要分为4个时段（春季，暑假，秋季，寒假）。当每一个时段上课要结束的时候，就会有一个续费周期，每个学科每个班级续费率的高低直接影响公司是否盈利的问题。所以实时的观测每个学科每个班级每个学科负责人每个教学负责人的续费率完成情况就显的尤为重要。</p>
-</blockquote>
-</li>
-<li>直播行课场景  <blockquote>
-<p>分析课中学员与老师互动行为，其中包含实时的连麦、发言、红包等行为数据，同时分析学员实时到课、完课、考试等数据对于管理学员和调整老师动作有重要的指导意义。</p>
-</blockquote>
-</li>
-<li>销售场景  <blockquote>
-<p>监控新线索的实时分配，以及后续销售外呼频次、外呼时长，统计销售线索覆盖量，外呼覆盖量等指标。通过分析销售对于学员的跟进与转化数据，对比个人和团队当日人次和金额达成目标，指导运营管理动作。</p>
-</blockquote>
-</li>
-<li>算法线索分场景  <blockquote>
-<p>每当进行广告投放的时候，针对每一个销售线索给出一个评分值，来评估这个线索可能转化的高低，利于销售人员更好的跟进，提高转化率。</p>
-</blockquote>
-<h3 id="实时数仓技术架构"><a href="#实时数仓技术架构" class="headerlink" title="实时数仓技术架构"></a>实时数仓技术架构</h3><h4 id="实时数仓选型"><a href="#实时数仓选型" class="headerlink" title="实时数仓选型"></a>实时数仓选型</h4>在2020年以前公司实时数据部分，主要由小时级和分钟级的支持。小时级部分使用基于hive/spark的小时级任务方案，分钟级使用spark-streaming方案。</li>
-</ul>
-<ul>
-<li>基于hive/spark小时级方案虽然能满足快速响应业务需求和变化的特点，但延迟性还是很高，并且大量的小时任务对集群计算资源有很大压力，很有可能导致这一批小时任务根本跑不完。 </li>
-<li>分钟级spark-streaming方案，能够满足数据时效性需求，但采用纯代码方式来开发，无法满足快速变化的数据需求  </li>
-</ul>
-<p>基于此，我们开始调研业界方案，目前业界有主要有两种实时数仓方案，分别是：  </p>
-<h5 id="实时数仓方案："><a href="#实时数仓方案：" class="headerlink" title="实时数仓方案："></a>实时数仓方案：</h5><p>分别可以采用lambda架构和kappa架构 </p>
-<ol>
-<li>lambda架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210819032639519.png"><br>如上图所实例：存在离线和实时两条链路。实时部分以消息队列的方式实时增量消费，一般以flink和kafka的组合实现，维度表存在mysql数据库或者hbase；离线部分一般采用T+1周期调度分析历史存量数据，每天凌晨产出，更新覆盖前一天的结果数据，计算引擎通常会选择hive. 优点是数据准确度高，出错后容易修复数据；缺点是架构复杂，运维成本高。</li>
-<li>kappa架构<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210820054517606.png"><br>kappa架构是由LinkedIn的Jay Kreps提出的（参考paper: <a target="_blank" rel="noopener" href="https://www.oreilly.com/radar/questioning-the-lambda-architecture/">https://www.oreilly.com/radar/questioning-the-lambda-architecture/</a> ），作为lambda方案的一个简化版，它移除了离线生产链路，思路是通过在kafka里保存全量历史数据，当需要历史计算的时候，就启动一个任务从头开始消费数据。优点是架构相对简化，数据来源单一，共用一套代码，开发效率高；缺点是必须要求消息队列中保存了存量数据，而且主要业务逻辑在计算层，比较消耗内存计算资源。<br>但由于之前流处理系统本身不成熟，对窗口计算，事件时间，乱序问题和SQL支持上的不成熟，导致大部分公司普遍采用lambda架构方案。但自从2020年2月11日，flink发布了1.10以及随后的1.11版本，引入了blink planner和hive集成极大的增强了对于SQL和流批一体支持上，这为真正实现kappa架构带来了一丝希望。</li>
-</ol>
-<h5 id="准实时数仓方案："><a href="#准实时数仓方案：" class="headerlink" title="准实时数仓方案："></a>准实时数仓方案：</h5><p><img src="/base-doris-olap-realtime-dw-in-xdf/20210819082651546.png"><br>其核心思路是，采用olap引擎来解决聚合计算和明细数据查询问题，配合分钟级别调度（一般是30或者15分钟）能力来支持业务实时数据需求。<br>**该架构优点是： **</p>
-<ul>
-<li>一般olap引擎都对SQL的支持度很好，开发成本极低 少量人员都可以支持复杂的业务需求，灵活应对业务变化。对于差钱的公司来说无疑非常节约成本的（财大气粗的公司除外）</li>
-<li>对于数据修复成本低，因为可以基于一个周期内的数据进行全量计算，所以修复数据只需要重跑任务即可。</li>
-<li>对于运维成本也较低，只需要监控任务运行成功失败即可</li>
-<li>对于数据时效性要求较高的场景，配合flink实时计算能力，在数据接入的时候进行部分聚合计算，之后再把结果写入olap引擎，不需要再配合调度计算，已此来到达秒级延迟。  </li>
-</ul>
-<p><strong>该架构的缺点是：</strong></p>
-<ul>
-<li>将计算转移到了olap引擎并同时兼顾了计算和查询需求，对olap引擎性能有较高的要求</li>
-<li>因为计算转移到了olap端，所以这种方案适用的数据体量规模有一定限制</li>
-</ul>
-<h4 id="基于doris的准实时方案"><a href="#基于doris的准实时方案" class="headerlink" title="基于doris的准实时方案"></a>基于doris的准实时方案</h4><p>结合公司数据规模，业务灵活性，成本方面的考虑我们选用的准实时的方案。那么接下来的就是确定采用什么olap引擎的问题了，目前业界开源的olap引擎主要有:clickhouse,durid,doris,impala+kudu,presto<br>这些引擎目前业界都有公司采用，比如：头条采用clickhouse(因为头条数据量巨大，并且头条专门有一个团队来优化和改进clickhouse的内核，有钱就是好)，快手采用durid,doris美团/作业帮有采用，impala+kudu网易是深度用户，presto主要用做adhoc查询。<br>对此可以看到，这些引擎都可以采用主要问题是，是否对这些引擎有足够的掌握程度以及引擎本身学习成本。经过一番对比以及之前本身对doris有一定的了解和横向对比使用的公司的规模，最后选择了doris引擎。<br>doris的优点如下：</p>
-<ul>
-<li>单表和多表join查询性能都很强，可以同时较好支持宽表查询场景和复杂多表查询，灵活性高</li>
-<li>支持实时数据更新操作</li>
-<li>支持流式和批量数据导入</li>
-<li>兼容mysql协议和标准sql</li>
-<li>支持ha，在线升级扩容，运维成本低</li>
-</ul>
-<h5 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h5><p><img src="/base-doris-olap-realtime-dw-in-xdf/20210819052757626.png"><br>上图是目前公司采用的架构方案，总体流程如下：</p>
-<ol>
-<li>数据接入部分，分为业务数据和日志数据。业务数据通过binlog方式收集到kafka后，在通过flink写入到doris ods层中</li>
-<li>mds层，采用每10分钟、半小时、一小时进行增量或全量的方式更新，构建业务模型层</li>
-<li>ads层，构建大宽表层加速上层查询速度</li>
-<li>对于一些分析类查询需求，通过doris的export功能导出到hive通过presto提供查询</li>
-<li>BI查询直接通过mysql协议访问db，配合查询层缓存来提供报表分析服务</li>
-<li>每层ETL任务通过自研调度系统调度运行，报警监控一体化</li>
-</ol>
-<h5 id="使用doris遇到的一些问题"><a href="#使用doris遇到的一些问题" class="headerlink" title="使用doris遇到的一些问题"></a>使用doris遇到的一些问题</h5><p>在实际业务应用中也遇到了一些问题，主要有如下几个方面的问题</p>
-<ol>
-<li>socket文件描述符泄漏问题<br>因为进行查询和ETL都需要通过JDBC或MYSQL客户端与fe的9030端口连接，在测试使用0.10版本时发现有的socket的文件描述符没有办法正常关闭，每小时都会产生几十个fd泄露，最后达到上限无法创建新的socket连接，只能通过重启的方式释放掉关闭异常的fd。<br>经过排查所有相关连接使用的代码，发现并没有可能产生连接不关闭的部分，咨询发现其他doris使用者并没有出现过类似问题，经过反复和社区沟通最终确定是MysqlNIOServer的bug，目前已经修复。</li>
-<li>语法相关问题<ul>
-<li>union all null值问题<br>在使用with语句生成的虚拟临时表时，如果有值为null的字段，这个字段在后续使用时的值会变成空字符串，不论是直接插入表还是通过not null进行过滤都无法得到正确结果。  </li>
-<li>常量值join时会关联出错误数据<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210820061524659.png"><br>如果with查询中使用了case when等对字段进行常量值赋值的情况，如果join关联时的关联条件使用到了这个字段，则有可能出现错误关联的情况，例如无法关联上的数据错误的关联上了。</li>
-<li>lead和lag函数导致的数据错位<br><img src="/base-doris-olap-realtime-dw-in-xdf/20210820061634668.png"><br>如图所示，在使用lead或者lag函数对数据处理时，会出现时间数据错位的问题<br>以上三个在使用时发现的问题，经过与百度的开发者反馈，现在这两个问题已经在新版本中完成修复。</li>
-</ul>
-</li>
-<li>副本不一致<br>为了保证数据的高可用，避免因为某个be磁盘损坏导致的数据丢失，同时可以提高本地计算的概率，通常会给表设置大于1的副本数，虽然TabletChecker和TabletScheduler会定期检查所有分片，并对不健康的分片进行修复，然而依然会出现某些副本不一致的情况。<br>针对某些副本不一致的情况我们进行研究，发现在使用Uniq模型时，如果进行ETL插入的数据含有多条相同unique key且没有对这些数据进行排序时，不同副本中实际存入的数据可能会出现不一致的情况。后续对sql进行改进，对unique key进行去重或者排序之后，这种情况的副本不一致就没有再次出现。  </li>
-<li>json解析时如果含有制表符则无法解析<br>在使用get_json_object解析json格式的字符串时，如果字符串中含有制表符，最后的解析会失败，这时必需对字符串进行字符替换，将制表符替换成空字符，然后再解析json。</li>
-</ol>
-<h4 id="使用总结"><a href="#使用总结" class="headerlink" title="使用总结"></a>使用总结</h4><ul>
-<li>在资源有限的情况，实时数仓还不能完全代替离线数仓。实时数仓对资源要求较高，成本换时间。离线数仓是时间换成本。也许在不久的将来随着算力的提高，新的技术的应用可以实现，但，目前还没有。</li>
-<li>随着数据量的增加计算延迟也会增加，两者呈线性关系。这就需要在业务需求和成本上做一个折中</li>
-<li>使用doris支撑了公司大部分实时数据需求，在保证开发成本和使用灵活性方面非常友好</li>
-<li>未来随着flink SQL方面越来越成熟可以把计算任务压力进一步转移到flink上，结合doris的olap能力，可以提供更低延迟数据需求</li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2021/08/19/base-doris-olap-realtime-dw-in-xdf/#more">more >></a>
+        
       
 
       
@@ -1063,93 +1045,6 @@
 
 
   
-    <article id="post-what-does-exactly-once-and-at-least-once-in-flink" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/26/what-does-exactly-once-and-at-least-once-in-flink/">一文搞懂Flink内部的Exactly Once和At Least Once</a>
-    </h1>
-  
-
-        
-        
-<a href="/2020/03/26/what-does-exactly-once-and-at-least-once-in-flink/" class="archive-article-date">
-  	<time datetime="2020-03-26T07:56:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在网上看到这篇文章，觉得写的挺好的，可以帮助大家理解fink中的Exactly Once和At Least Once语义到底是什么。</p>
-<p>看完本文，你能get到以下知识</p>
-<ul>
-<li>介绍CheckPoint如何保障Flink任务的高可用</li>
-<li>CheckPoint中的状态简介</li>
-<li>如何实现全域一致的分布式快照？</li>
-<li>什么是barrier？什么是barrier对齐？</li>
-<li>证明了：为什么barrier对齐就是Exactly Once？为什么barrier不对齐就是 At Least Once？</li>
-</ul>
-<p>有状态函数和运算符在各个元素/事件的处理中存储数据（状态数据可以修改和查询，可以自己维护，根据自己的业务场景，保存历史数据或者中间结果到状态中）</p>
-        
-          <a class="article-more-a" href="/2020/03/26/what-does-exactly-once-and-at-least-once-in-flink/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/26/what-does-exactly-once-and-at-least-once-in-flink/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1259,15 +1154,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">apache</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">apache</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1283,11 +1178,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事物</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
+                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1295,7 +1186,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
+                <a href="javascript:void(0)" class="js-tag color3">事物</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1379,11 +1274,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
               </li>
              
               <li class="article-tag-list-item">

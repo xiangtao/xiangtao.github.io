@@ -16,7 +16,7 @@
 <meta property="og:description" content="binlog事件数据结构 TABLE_MAP  row格式的binlog文件中，每个ROW_EVENT之前都有一个TABLE_MAP_EVENT，用于描述该更新的元数据信息，记录包括，tableId, database,table,columnTypes等    结构如下：  123监听的事件类型:TABLE_MAPheader:EventHeaderV4&amp;#123;timestamp&#x3D;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-26T06:44:32.000Z">
-<meta property="article:modified_time" content="2021-08-27T10:26:04.627Z">
+<meta property="article:modified_time" content="2021-09-08T06:15:38.220Z">
 <meta property="article:author" content="taox">
 <meta property="article:tag" content="java spring spring-cloud hbase bigdata flink">
 <meta name="twitter:card" content="summary">
@@ -216,6 +216,8 @@
 </ul>
 <p>结构如下： </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">监听的事件类型:TABLE_MAP</span><br><span class="line">header:EventHeaderV4&#123;timestamp&#x3D;1629959676000, eventType&#x3D;TABLE_MAP, serverId&#x3D;1, headerLength&#x3D;19, dataLength&#x3D;35, nextPosition&#x3D;9806, flags&#x3D;0&#125;</span><br><span class="line">data:TableMapEventData&#123;tableId&#x3D;1447, database&#x3D;&#39;flink_sql&#39;, table&#x3D;&#39;xx&#39;, columnTypes&#x3D;3, 15, 3, columnMetadata&#x3D;0, 180, 0, columnNullability&#x3D;&#123;1, 2&#125;, eventMetadata&#x3D;null&#125;</span><br></pre></td></tr></table></figure>
+<span id="more"></span>  
+
 <ul>
 <li> EXT_UPDATE_ROWS <blockquote>
 <p>update操作事件，记录tableId，includedColumnsBeforeUpdate（更新之前列位置），includedColumns（更新后的列位置），before（更新之前的数据），after（更新之后的数据）。不包括列名信息</p>
@@ -533,15 +535,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">apache</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">jvm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">apache</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -557,11 +559,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事物</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
+                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -569,7 +567,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
+                <a href="javascript:void(0)" class="js-tag color3">事物</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">数据一致性</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -653,11 +655,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
               </li>
              
               <li class="article-tag-list-item">
