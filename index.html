@@ -179,6 +179,189 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-linux-core-dump" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/02/14/linux-core-dump/">be crash引起的IO高的问题</a>
+    </h1>
+  
+
+        
+        
+<a href="/2022/02/14/linux-core-dump/" class="archive-article-date">
+  	<time datetime="2022-02-14T06:23:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-02-14</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近，doris集群不定时出现be节点宕掉的情况，查看监控发现在宕掉的节点load很高，io write写很高。所以首先怀疑有大的sql执行。经过一番排查，始终找不出是什么sql会导致这么高的io。于是又怀疑是不是broker上的同步任务导致的，于是我在机器上写了个监控程序，看挂的时候到底是那个进程导致了这么高的io.</p>
+<p>经过一番操作，过几天后又出现be挂掉的情况，于是登录上发现有个abrt-hook-ccpp的进程io很高，这时才找到了真正的问题所在。</p>
+<h2 id="abrt-hook-ccpp-进程"><a href="#abrt-hook-ccpp-进程" class="headerlink" title="abrt-hook-ccpp 进程"></a>abrt-hook-ccpp 进程</h2><p>linux 上的c/c++程序，当出现一些内存越界，非法访问的问题时会导致进程直接crash，现象就是直接挂掉了，这种问题很难排查。好在Linux内核会监控这个crash的情况，会捕获到进程崩溃信息，然后将进程的coredump信息写入到文件中。</p>
+<h3 id="怎么生成coredump信息"><a href="#怎么生成coredump信息" class="headerlink" title="怎么生成coredump信息"></a>怎么生成coredump信息</h3><ul>
+<li><p>开启生成coredump信息</p>
+<ul>
+<li>输入命令ulimit -a <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">core file size          (blocks, -c) 0</span><br><span class="line">data seg size           (kbytes, -d) unlimited</span><br><span class="line">scheduling priority             (-e) 0</span><br><span class="line">file size               (blocks, -f) unlimited</span><br><span class="line">pending signals                 (-i) 513562</span><br><span class="line">max locked memory       (kbytes, -l) 64</span><br><span class="line">max memory size         (kbytes, -m) unlimited</span><br><span class="line">open files                      (-n) 10240</span><br><span class="line">pipe size            (512 bytes, -p) 8</span><br><span class="line">POSIX message queues     (bytes, -q) 819200</span><br><span class="line">real-time priority              (-r) 0</span><br><span class="line">stack size              (kbytes, -s) 10240</span><br><span class="line">cpu time               (seconds, -t) unlimited</span><br><span class="line">max user processes              (-u) 513562</span><br><span class="line">virtual memory          (kbytes, -v) unlimited</span><br><span class="line">file locks                      (-x) unlimited</span><br></pre></td></tr></table></figure>
+其中的 -c: core file size 如果设置为0的话，当程序崩溃的时候就不会产生core文件。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ulimit -c 1024 #设置CoreDump文件大小为1024k</span><br><span class="line">ulimit -c unlimited #不限制CoreDump文件大小</span><br></pre></td></tr></table></figure>
+注意：通常be的coredump很大，不要设置成 unlimited</li>
+</ul>
+</li>
+<li><p>指定生成CoreDump文件的路径</p>
+</li>
+</ul>
+<p>默认情况下，coreDump生成的文件名为core，默认在进程当前目前。</p>
+<p>/proc/sys/kernel/core_pattern 可以设置格式化的 core文件保存位置或文件名，默认的是 |/usr/libexec/abrt-hook-ccpp %s %c %p %u %g %t e<br>可以使用命令修改：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl kernel.core_pattern&#x3D;&quot;&#x2F;tmp&#x2F;core_%t_%e_%p&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关于abrt-hook-ccpp"><a href="#关于abrt-hook-ccpp" class="headerlink" title="关于abrt-hook-ccpp"></a>关于abrt-hook-ccpp</h3><p>上面的core_pattern默认值是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">|&#x2F;usr&#x2F;libexec&#x2F;abrt-hook-ccpp %s %c %p %u %g %t e</span><br></pre></td></tr></table></figure>
+<p>这种格式的意思是：如果core_pattern 中第一个字符是 Linux管道符 |, 那么Linux 内核在捕获进程崩溃信息的时候，就会以root权限执行管道符后门的程序或者脚本，将进程崩溃信息传递给这个程序或者脚本。</p>
+<p>abrt-hook-ccpp 是 abrt进程的一个钩子程序。abrt-hook-ccpp会收集coredump信息，把这些信息写入 /var/spool/abrt 这个目录，供abrt服务使用。</p>
+<p>Abrt是linux一个自动化 Bug 检测和报告工具。这是红帽领导开发的一个项目</p>
+<blockquote>
+<p>ABRT is a set of tools to help users detect and report application crashes. Its main purpose is to ease the process of reporting an issue and finding a solution. </p>
+</blockquote>
+<p>参考：<a target="_blank" rel="noopener" href="https://abrt.readthedocs.io/en/latest/">https://abrt.readthedocs.io/en/latest/</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">doris</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">abrt</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2022/02/14/linux-core-dump/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-doris-upgrade-md" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/11/15/doris-upgrade-md/">doris版本升级</a>
+    </h1>
+  
+
+        
+        
+<a href="/2021/11/15/doris-upgrade-md/" class="archive-article-date">
+  	<time datetime="2021-11-15T03:05:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-15</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文记录一下doris从0.12.21版本升级到 0.13.14版本的步骤。</p>
+<h3 id="搭建0-12-21版本测试环境"><a href="#搭建0-12-21版本测试环境" class="headerlink" title="搭建0.12.21版本测试环境"></a>搭建0.12.21版本测试环境</h3><p><img src="/doris-upgrade-md/20211116102519741.png"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">doris</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/11/15/doris-upgrade-md/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-debezium-sourcecode-plugin-architecture" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -870,181 +1053,6 @@
 
 
   
-    <article id="post-flink-client-source-analysis" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/25/flink-client-source-analysis/">【flink源码】从Flink client 提交源码看第三方jar包的动态加载的解决方案</a>
-    </h1>
-  
-
-        
-        
-<a href="/2021/02/25/flink-client-source-analysis/" class="archive-article-date">
-  	<time datetime="2021-02-25T12:32:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-25</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="1-flink-run-提交流程源码分析"><a href="#1-flink-run-提交流程源码分析" class="headerlink" title="1. flink run 提交流程源码分析"></a>1. flink run 提交流程源码分析</h3><p>查看flink脚本找到执行run命令的入口类，如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exec $JAVA_RUN $JVM_ARGS $FLINK_ENV_JAVA_OPTS &quot;$&#123;log_setting[@]&#125;&quot; -classpath &quot;&#96;manglePathList &quot;$CC_CLASSPATH:$INTERNAL_HADOOP_CLASSPATHS&quot;&#96;&quot; org.apache.flink.client.cli.CliFrontend &quot;$@</span><br></pre></td></tr></table></figure>
-<p>入口类为：org.apache.flink.client.cli.CliFrontend。 最终会调用 parseParameters(String[] args) 方法来执行命令解析，run 命令会调用 run(params) 方法，如下：</p>
-        
-          <a class="article-more-a" href="/2021/02/25/flink-client-source-analysis/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/25/flink-client-source-analysis/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-The-Apache-21-Years-birthday" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/26/The-Apache-21-Years-birthday/">The-Apache-21-Years-birthday</a>
-    </h1>
-  
-
-        
-        
-<a href="/2020/03/26/The-Apache-21-Years-birthday/" class="archive-article-date">
-  	<time datetime="2020-03-26T14:31:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="庆祝-ASF-21周年"><a href="#庆祝-ASF-21周年" class="headerlink" title="庆祝 ASF 21周年"></a>庆祝 ASF 21周年</h3><p>热烈庆祝Apache基金会成立21周年,这个世界上最大的开源组织成就许多伟大的开源项目。<br>可以说现在互联网科技界大部分公司都在使用apache组织的开源软件，特别是大数据领域 出现了许多顶级项目，如hadoop,hbase,flink，kafaka等 可以说没有apache就没有如今这么繁荣的大数据市场,没有apache我想中国互联网估计得倒退10年。</p>
-<h5 id="以下是apache列出的现在的重点项目介绍"><a href="#以下是apache列出的现在的重点项目介绍" class="headerlink" title="以下是apache列出的现在的重点项目介绍"></a>以下是apache列出的现在的重点项目介绍</h5><ul>
-<li>中国第二大快递公司SF-Express在COVID-19冠状病毒期间使用Apache SkyWalking在全球进行运送；</li>
-<li>Apache Guacamole的无客户端远程桌面网关可以帮助全世界成千上万的个人、企业和大学在家安全工作，而无需绑定到特定的设备、VPN或客户端；</li>
-<li>阿里巴巴使用Apache Flink每秒处理超过25亿条记录，用于商品大盘和实时用户推荐；</li>
-<li>欧洲航天局的木星航天器任务控制系统由Apache Karaf、Apache Maven和Apache Groovy提供支持；</li>
-<li>英国政府通信总部（GCHQ）使用Apache Accumulo、Apache HBase和Apache Parquet存储和管理数PB的数据；</li>
-<li>Netflix使用Apache Druid管理其1.5万亿行数据仓库，以管理用户跨平台点击Netflix图标或从浏览器登录时看到的内容；</li>
-<li>Uber使用Apache Hudi（孵化中）管理超过100PB数据的近实时数据湖，支持了从数仓到机器学习的所有功能；</li>
-<li>波士顿儿童医院使用Apache cTAKES将电子健康记录中的表型和基因组数据链接起来，以实现精确的健康发现；</li>
-<li>Amazon、DataStax、IBM、Microsoft、Neo4j、NBC Universal和许多其他公司使用Apache Tinkerpop图形数据库并编写复杂的遍历；</li>
-<li>全球生物多样性信息基金利用apachebeam、Hadoop、HBase、Lucene、Spark等工具整合了近1600个机构、100多万个物种的生物多样性数据和近1.4亿个地点记录，供免费研究使用；</li>
-<li>欧盟委员会使用Apache Camel开发了新的API网关基础设施；</li>
-<li>中国电信公司翼支付使用Apache ShardingSphere（孵化中）为分布在30多个应用程序中的移动支付扩展到100亿个数据集；</li>
-<li>苹果的Siri使用Apache HBase在10秒内完成全环复制；</li>
-<li>美国海军使用Apache Rya为智能无人机、自主小型机器人群、载人无人团队高级战术通信等提供动力；</li>
-<li>全世界数以亿计的网站都是由Apache HTTP服务器提供支持。</li>
-</ul>
-<p>其中值得关注的是 apache flink ，和 apache hudi。<br>flink 提供批量和实时计算的一体框架 ， hudi提供的数据湖的支持。</p>
-<p>官方庆祝🎉<br><a target="_blank" rel="noopener" href="https://blogs.apache.org/foundation/entry/the-apache-software-foundation-celebrates2">https://blogs.apache.org/foundation/entry/the-apache-software-foundation-celebrates2</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">apache</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/26/The-Apache-21-Years-birthday/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1059,7 +1067,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 taox
+    		&copy; 2022 taox
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1178,14 +1186,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">事物</a>
               </li>
              
@@ -1194,11 +1194,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">flink</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">jackson</a>
+                <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1219,6 +1223,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">调度系统</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">jackson</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1258,6 +1266,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">abrt</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">binlog</a>
               </li>
              
@@ -1274,11 +1286,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">

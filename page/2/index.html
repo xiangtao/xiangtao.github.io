@@ -179,6 +179,181 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-flink-client-source-analysis" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/25/flink-client-source-analysis/">【flink源码】从Flink client 提交源码看第三方jar包的动态加载的解决方案</a>
+    </h1>
+  
+
+        
+        
+<a href="/2021/02/25/flink-client-source-analysis/" class="archive-article-date">
+  	<time datetime="2021-02-25T12:32:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-25</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="1-flink-run-提交流程源码分析"><a href="#1-flink-run-提交流程源码分析" class="headerlink" title="1. flink run 提交流程源码分析"></a>1. flink run 提交流程源码分析</h3><p>查看flink脚本找到执行run命令的入口类，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exec $JAVA_RUN $JVM_ARGS $FLINK_ENV_JAVA_OPTS &quot;$&#123;log_setting[@]&#125;&quot; -classpath &quot;&#96;manglePathList &quot;$CC_CLASSPATH:$INTERNAL_HADOOP_CLASSPATHS&quot;&#96;&quot; org.apache.flink.client.cli.CliFrontend &quot;$@</span><br></pre></td></tr></table></figure>
+<p>入口类为：org.apache.flink.client.cli.CliFrontend。 最终会调用 parseParameters(String[] args) 方法来执行命令解析，run 命令会调用 run(params) 方法，如下：</p>
+        
+          <a class="article-more-a" href="/2021/02/25/flink-client-source-analysis/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/02/25/flink-client-source-analysis/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-The-Apache-21-Years-birthday" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/26/The-Apache-21-Years-birthday/">The-Apache-21-Years-birthday</a>
+    </h1>
+  
+
+        
+        
+<a href="/2020/03/26/The-Apache-21-Years-birthday/" class="archive-article-date">
+  	<time datetime="2020-03-26T14:31:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="庆祝-ASF-21周年"><a href="#庆祝-ASF-21周年" class="headerlink" title="庆祝 ASF 21周年"></a>庆祝 ASF 21周年</h3><p>热烈庆祝Apache基金会成立21周年,这个世界上最大的开源组织成就许多伟大的开源项目。<br>可以说现在互联网科技界大部分公司都在使用apache组织的开源软件，特别是大数据领域 出现了许多顶级项目，如hadoop,hbase,flink，kafaka等 可以说没有apache就没有如今这么繁荣的大数据市场,没有apache我想中国互联网估计得倒退10年。</p>
+<h5 id="以下是apache列出的现在的重点项目介绍"><a href="#以下是apache列出的现在的重点项目介绍" class="headerlink" title="以下是apache列出的现在的重点项目介绍"></a>以下是apache列出的现在的重点项目介绍</h5><ul>
+<li>中国第二大快递公司SF-Express在COVID-19冠状病毒期间使用Apache SkyWalking在全球进行运送；</li>
+<li>Apache Guacamole的无客户端远程桌面网关可以帮助全世界成千上万的个人、企业和大学在家安全工作，而无需绑定到特定的设备、VPN或客户端；</li>
+<li>阿里巴巴使用Apache Flink每秒处理超过25亿条记录，用于商品大盘和实时用户推荐；</li>
+<li>欧洲航天局的木星航天器任务控制系统由Apache Karaf、Apache Maven和Apache Groovy提供支持；</li>
+<li>英国政府通信总部（GCHQ）使用Apache Accumulo、Apache HBase和Apache Parquet存储和管理数PB的数据；</li>
+<li>Netflix使用Apache Druid管理其1.5万亿行数据仓库，以管理用户跨平台点击Netflix图标或从浏览器登录时看到的内容；</li>
+<li>Uber使用Apache Hudi（孵化中）管理超过100PB数据的近实时数据湖，支持了从数仓到机器学习的所有功能；</li>
+<li>波士顿儿童医院使用Apache cTAKES将电子健康记录中的表型和基因组数据链接起来，以实现精确的健康发现；</li>
+<li>Amazon、DataStax、IBM、Microsoft、Neo4j、NBC Universal和许多其他公司使用Apache Tinkerpop图形数据库并编写复杂的遍历；</li>
+<li>全球生物多样性信息基金利用apachebeam、Hadoop、HBase、Lucene、Spark等工具整合了近1600个机构、100多万个物种的生物多样性数据和近1.4亿个地点记录，供免费研究使用；</li>
+<li>欧盟委员会使用Apache Camel开发了新的API网关基础设施；</li>
+<li>中国电信公司翼支付使用Apache ShardingSphere（孵化中）为分布在30多个应用程序中的移动支付扩展到100亿个数据集；</li>
+<li>苹果的Siri使用Apache HBase在10秒内完成全环复制；</li>
+<li>美国海军使用Apache Rya为智能无人机、自主小型机器人群、载人无人团队高级战术通信等提供动力；</li>
+<li>全世界数以亿计的网站都是由Apache HTTP服务器提供支持。</li>
+</ul>
+<p>其中值得关注的是 apache flink ，和 apache hudi。<br>flink 提供批量和实时计算的一体框架 ， hudi提供的数据湖的支持。</p>
+<p>官方庆祝🎉<br><a target="_blank" rel="noopener" href="https://blogs.apache.org/foundation/entry/the-apache-software-foundation-celebrates2">https://blogs.apache.org/foundation/entry/the-apache-software-foundation-celebrates2</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">apache</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/03/26/The-Apache-21-Years-birthday/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-what-does-exactly-once-and-at-least-once-in-flink" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -890,178 +1065,6 @@
 
 
   
-    <article id="post-from-0-to-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/01/from-0-to-1/">从0到1学事务-写在开头的话</a>
-    </h1>
-  
-
-        
-        
-<a href="/2020/03/01/from-0-to-1/" class="archive-article-date">
-  	<time datetime="2020-03-01T14:06:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-01</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>最近几周专门研究了一下事务相关的一些理论和原理，把我之前那些模棱两可的东西总算搞明白了些，那么接下来我将写一系列的文章把整个知识体系都梳理一遍。一来是把这些知识都记录下来，方便以后查看，二来是把这些分享给对这些知识还不太清楚的同学。<br>我大概分以下几个主题来介绍：</p>
-<ul>
-<li>从0到1学事务-事务理论介绍</li>
-<li>从0到1学事务-mysql中事务的实现</li>
-<li>从0到1学事务-在spring中使用事务</li>
-<li>从0到1学事务-分布式事务介绍</li>
-<li>从0到1学事务-分布式事务之XA</li>
-<li>从0到1学事务-分布式事务之BASE</li>
-<li>从0到1学事务-分布式事务之seata</li>
-</ul>
-<p>由于本人水平有限，对其中理解不到位的欢迎各位同学指正，共同进步！</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">事务</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">分布式事务</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/01/from-0-to-1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-fastjson-so-quickly-why-also-like-use-jackson" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/02/26/fastjson-so-quickly-why-also-like-use-jackson/">fastjson 这么快，为啥老外还是热衷 jackson?</a>
-    </h1>
-  
-
-        
-        
-<a href="/2020/02/26/fastjson-so-quickly-why-also-like-use-jackson/" class="archive-article-date">
-  	<time datetime="2020-02-26T07:58:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-26</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>知乎上有人提问：fastjson这么快，为啥老外还是热衷 jackson? 下面是甘明的回答，从各个方面分析了这个问题：<br>哈哈哈，我来回答这个问题！<br>因为我实在是对这两个库太熟悉了。</p>
-        
-          <a class="article-more-a" href="/2020/02/26/fastjson-so-quickly-why-also-like-use-jackson/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">jackson</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/02/26/fastjson-so-quickly-why-also-like-use-jackson/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &amp;raquo;</a>
@@ -1076,7 +1079,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 taox
+    		&copy; 2022 taox
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1195,14 +1198,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">事物</a>
               </li>
              
@@ -1211,11 +1206,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">debezium</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">flink</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">jackson</a>
+                <a href="javascript:void(0)" class="js-tag color5">数据仓库</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1236,6 +1235,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">调度系统</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">jackson</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1275,6 +1278,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">abrt</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">binlog</a>
               </li>
              
@@ -1291,11 +1298,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring-boot</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">
