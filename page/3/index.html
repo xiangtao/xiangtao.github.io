@@ -179,6 +179,110 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-mysql-查询索引选择" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/02/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/">mysql查询是怎么选择索引的？</a>
+    </h1>
+  
+
+        
+        
+<a href="/2020/03/02/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/" class="archive-article-date">
+  	<time datetime="2020-03-02T08:32:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-02</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="表结构"><a href="#表结构" class="headerlink" title="表结构"></a>表结构</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `scheduler_task_tracker` (</span><br><span class="line">  `id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  `task_id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_start_time` datetime <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_status` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_end_time` datetime <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `scheduler_node` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `client_node` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `is_execute_notify` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `partition_code` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `is_del` <span class="type">smallint</span>(<span class="number">6</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `task_name` <span class="type">varchar</span>(<span class="number">500</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `user_id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (`id`),</span><br><span class="line">  KEY `task_start_time_ind` (`task_start_time`),</span><br><span class="line">  KEY `task_end_time_ind` (`task_end_time`),</span><br><span class="line">  KEY `task_name_ind` (`task_name`(<span class="number">255</span>)) <span class="keyword">USING</span> BTREE,</span><br><span class="line">  KEY `task_id_partition_code_ind` (`task_id`,`partition_code`)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB AUTO_INCREMENT<span class="operator">=</span><span class="number">21614019</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="索引信息"><a href="#索引信息" class="headerlink" title="索引信息"></a>索引信息</h5><p><img src="/mysql-query-choice-index/20200302045610625.png"><br>task_start_time的Cardinality： 3453770<br>task_end_time的Cardinality：   6907541</p>
+<h5 id="查询SQL"><a href="#查询SQL" class="headerlink" title="查询SQL"></a>查询SQL</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">explain </span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">			id <span class="keyword">AS</span> taskTrackerID,</span><br><span class="line">			task_id <span class="keyword">AS</span> taskInstanceId,</span><br><span class="line">			task_start_time <span class="keyword">AS</span> taskStartTime,</span><br><span class="line">			is_debug <span class="keyword">AS</span> isDebug,</span><br><span class="line">			task_status <span class="keyword">AS</span> taskStatus,</span><br><span class="line">			task_progress <span class="keyword">AS</span> taskProgress,</span><br><span class="line">			task_end_time <span class="keyword">AS</span> taskEndTime,</span><br><span class="line">			scheduler_node <span class="keyword">AS</span> schedulerNode,</span><br><span class="line">			is_del <span class="keyword">AS</span> isDel,</span><br><span class="line">			client_node <span class="keyword">AS</span> clientNode,</span><br><span class="line">			user_id <span class="keyword">AS</span> userId,</span><br><span class="line">			partition_code <span class="keyword">AS</span> partitionCode,</span><br><span class="line">			task_name <span class="keyword">AS</span> taskName</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			scheduler_task_tracker</span><br><span class="line">		<span class="keyword">WHERE</span></span><br><span class="line">	task_status <span class="operator">=</span> <span class="number">6</span></span><br><span class="line">    <span class="keyword">and</span> task_name <span class="keyword">LIKE</span> <span class="string">&#x27;%rpt_c2c_sell_vr_report_di%&#x27;</span> </span><br><span class="line">    <span class="keyword">and</span> task_start_time <span class="operator">&gt;=</span><span class="string">&#x27;2020-03-01 00:00:00&#x27;</span> </span><br><span class="line">    <span class="keyword">and</span> task_end_time<span class="operator">&lt;=</span><span class="string">&#x27;2020-03-02 23:59:59&#x27;</span> </span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span>  task_start_time <span class="keyword">asc</span> </span><br><span class="line">    limit <span class="number">0</span>, <span class="number">10</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>查询按照 task_start_time 排序，走索引’task_start_time_ind’ 扫描：78462行，较快<br><img src="/mysql-query-choice-index/20200302044049215.png"></p>
+</li>
+<li><p>查询按照 task_end_time 排序，走索引’task_end_time_ind’ 扫描：3454055行 ，比较慢<br><img src="/mysql-query-choice-index/20200302044339710.png"></p>
+</li>
+</ol>
+<p>分析如下： </p>
+<ul>
+<li>task_name 有索引但用了 like 不走这个索引</li>
+<li>因为有了排序 1，2 查询都按照排序字段上的索引来查询</li>
+<li>task_end_time基数太大所以扫描的行数多，查询慢</li>
+</ul>
+<p>怎么使得第二个查询变快呢？</p>
+<ul>
+<li>可以建立task_start_time和task_end_time的联合查询 </li>
+</ul>
+<p>mysql主要根据优化器来判断使用那个索引还是使用全表扫描</p>
+<ul>
+<li>优化器优化判断的指标<br>需要扫描的行数，是否使用临时表，是否排序等因素来计数查询的成本</li>
+<li>扫描行数判断<br>那么优化器是怎么获取扫描的总行数的，其实就和抽样检查类似，因为索引是有序的，就可以使用采样统计这种算法算出大概的扫描行数，可以通过show index查看索引的Cardinality预估值。</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">mysql</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">索引</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/03/02/mysql-%E6%9F%A5%E8%AF%A2%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-from-0-to-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1113,158 +1217,9 @@
 
 
   
-    <article id="post-out-of-memory-example" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/02/13/out-of-memory-example/">Out Of Memory 的发生情况</a>
-    </h1>
-  
-
-        
-        
-<a href="/2020/02/13/out-of-memory-example/" class="archive-article-date">
-  	<time datetime="2020-02-13T14:26:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-13</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="1-Java-堆空间"><a href="#1-Java-堆空间" class="headerlink" title="1. Java 堆空间"></a>1. Java 堆空间</h3><p><strong>发生频率：</strong> 5颗星<br><strong>造成原因</strong>  </p>
-<ol>
-<li> 无法在 Java 堆中分配对象</li>
-<li> 吞吐量增加</li>
-<li> 应用程序无意中保存了对象引用，对象无法被 GC 回收</li>
-<li> 应用程序过度使用 finalizer。finalizer 对象不能被 GC 立刻回收。finalizer 由结束队列服务的守护线程调用，有时 finalizer 线程的处理能力无法跟上结束队列的增长</li>
-</ol>
-<p><strong>解决方案</strong></p>
-<blockquote>
-<p>单位对应：GB -&gt; G, g；MB -&gt; M, m；KB -&gt; K, k</p>
-</blockquote>
-<ol>
-<li> 使用 -Xmx 增加堆大小</li>
-<li> 修复应用程序中的内存泄漏</li>
-</ol>
-<h3 id="2-GC-开销超过限制"><a href="#2-GC-开销超过限制" class="headerlink" title="2. GC 开销超过限制"></a>2. GC 开销超过限制</h3><p><strong>发生频率：</strong> 5颗星<br><strong>造成原因</strong></p>
-<ol>
-<li> Java 进程98%的时间在进行垃圾回收，恢复了不到2%的堆空间，最后连续5个（编译时常量）垃圾回收一直如此。 </li>
-</ol>
-<p><strong>解决方案</strong><br>1.使用 -Xmx 增加堆大小<br>2.使用 -XX:-UseGCOverheadLimit 取消GC开销限制<br>3.修复应用程序中的内存泄漏</p>
-<h3 id="3-请求的数组大小超过虚拟机限制"><a href="#3-请求的数组大小超过虚拟机限制" class="headerlink" title="3.请求的数组大小超过虚拟机限制**"></a>3.请求的数组大小超过虚拟机限制**</h3><p><strong>发生频率：</strong> 2颗星<br><strong>造成原因</strong><br>1.应用程序试图分配一个超过堆大小的数组</p>
-<p><strong>解决方案</strong></p>
-<ol>
-<li> 使用 -Xmx 增加堆大小</li>
-<li> 修复应用程序中分配巨大数组的 bug</li>
-</ol>
-<h3 id="4-Perm-gen-空间"><a href="#4-Perm-gen-空间" class="headerlink" title="4.Perm gen 空间"></a>4.Perm gen 空间</h3><p><strong>发生频率：</strong> 3颗星<br><strong>造成原因</strong><br>Perm gen 空间包含：</p>
-<ol>
-<li>类的名字、字段、方法</li>
-<li>与类相关的对象数组和类型数组</li>
-<li>JIT 编译器优化<br>当 Perm gen 空间用尽时，将抛出异常。</li>
-</ol>
-<p><strong>解决方案</strong></p>
-<ol>
-<li>使用 -XX: MaxPermSize 增加 Permgen 大小</li>
-<li>不重启应用部署应用程序可能会导致此问题。重启 JVM 解决</li>
-</ol>
-<h3 id="5-Metaspace"><a href="#5-Metaspace" class="headerlink" title="5. Metaspace"></a>5. Metaspace</h3><p><strong>发生频率：</strong> 3颗星<br><strong>造成原因</strong></p>
-<ol>
-<li> 从<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzI3ODcxMzQzMw==&mid=2247483776&idx=1&sn=aa0203cfca67ff450ecaf1d9d147582d&chksm=eb5384b6dc240da057200d0f0edbf82ef41c03ea78df0f51e7476d155a2ea2dcbce4e5d0082c&scene=21#wechat_redirect">Java 8</a>开始 Perm gen 改成了 Metaspace，在本机内存中分配 class 元数据（称为 metaspace）。如果 metaspace 耗尽，则抛出异常</li>
-</ol>
-<p><strong>解决方案</strong></p>
-<ol>
-<li>通过命令行设置 -XX: MaxMetaSpaceSize 增加 metaspace 大小</li>
-<li>取消 -XX: maxmetsspacedize</li>
-<li>减小 Java 堆大小,为 MetaSpace 提供更多的可用空间</li>
-<li>为服务器分配更多的内存</li>
-<li>可能是应用程序 bug，修复 bug</li>
-</ol>
-<h3 id="6-无法新建本机线程"><a href="#6-无法新建本机线程" class="headerlink" title="6.无法新建本机线程"></a>6.无法新建本机线程</h3><p><strong>发生频率：</strong> 5颗星<br><strong>造成原因</strong> </p>
-<ol>
-<li>内存不足，无法创建新线程。由于线程在本机内存中创建，报告这个错误表明本机内存空间不足</li>
-</ol>
-<p>** 解决方案 **</p>
-<ol>
-<li>为机器分配更多的内存</li>
-<li>减少 Java 堆空间</li>
-<li>修复应用程序中的线程泄漏。</li>
-<li>增加操作系统级别的限制<ul>
-<li>ulimit -a</li>
-<li>用户进程数增大 (-u) 1800</li>
-</ul>
-</li>
-<li>使用 -Xss 减小线程堆栈大小<h3 id="7-杀死进程或子进程"><a href="#7-杀死进程或子进程" class="headerlink" title="7. 杀死进程或子进程"></a>7. 杀死进程或子进程</h3></li>
-</ol>
-<p><strong>发生频率：</strong> 1颗星<br><strong>造成原因</strong><br>1.内核任务：内存不足结束器，在可用内存极低的情况下会杀死进程<br><strong>解决方案</strong> </p>
-<ol>
-<li> 将进程迁移到不同的机器上</li>
-<li> 给机器增加更多内存<br>与其他 OOM 错误不同，这是由操作系统而非<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzI3ODcxMzQzMw==&mid=2247487556&idx=2&sn=174f51201a53679564d40ade1cc5cb1d&chksm=eb539572dc241c64ffa677116e55ae4723920b53a4e2d6f4835190e11d93a324778262d22763&scene=21#wechat_redirect">JVM</a>触发的。</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/02/13/out-of-memory-example/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/2/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+      <a class="extend prev" rel="prev" href="/page/2/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">Next &amp;raquo;</a>
     </nav>
   
 
@@ -1500,6 +1455,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">spring</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">dw</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">hadoop</a>
               </li>
              
               <li class="article-tag-list-item">

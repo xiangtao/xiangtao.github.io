@@ -179,6 +179,88 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-dw-in-education-md" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/04/18/dw-in-education-md/">现代数据仓库的建设之路</a>
+    </h1>
+  
+
+        
+        
+<a href="/2022/04/18/dw-in-education-md/" class="archive-article-date">
+  	<time datetime="2022-04-18T02:24:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-04-18</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="什么是数据仓库"><a href="#什么是数据仓库" class="headerlink" title="什么是数据仓库"></a>什么是数据仓库</h3><p>数据仓库 ，由数据仓库之父比尔·恩门（Bill Inmon）于1990年提出，他在1991年出版的“Building the Data Warehouse”（《建立数据仓库》）一书中所提出的数据仓库的定义——数据仓库（Data Warehouse）是一个面向主题的（Subject Oriented）、集成的（Integrated）、相对稳定的（Non-Volatile）、反映历史变化（Time Variant）的数据集合，用于支持管理决策(Decision Making Support)。<br>现在我们构建的数据仓库，仍然是在Bill Inmon提出的数仓理论基础之上，只不过现在根据时代不同，需求变了，衍生出各种工具和技术来支持数据仓库的发展。比如：大数据技术，数据湖技术，流计算技术等。</p>
+        
+          <a class="article-more-a" href="/2022/04/18/dw-in-education-md/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">dw</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">hadoop</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2022/04/18/dw-in-education-md/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-linux-core-dump" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -959,103 +1041,9 @@
 
 
   
-    <article id="post-flink-plat" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/06/15/flink-plat/">实时平台对比</a>
-    </h1>
-  
-
-        
-        
-<a href="/2021/06/15/flink-plat/" class="archive-article-date">
-  	<time datetime="2021-06-15T10:20:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-06-15</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="实时平台对比"><a href="#实时平台对比" class="headerlink" title="实时平台对比"></a>实时平台对比</h1><h3 id="美团实时平台"><a href="#美团实时平台" class="headerlink" title="美团实时平台"></a>美团实时平台</h3><h4 id="规模"><a href="#规模" class="headerlink" title="规模"></a>规模</h4><ul>
-<li>机器几千台</li>
-<li>任务万级</li>
-<li>数据量 1.5亿/s</li>
-</ul>
-<h4 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h4><p><img src="/20210713104502690/20210713104852925.png"></p>
-<ul>
-<li>最底层是收集层，这一层负责收集用户的实时数据，包括 Binlog、后端服务日志以及 IoT 数据，经过日志收集团队和 DB 收集团队的处理，数据将会被收集到 Kafka 中。这些数据不只是参与实时计算，也会参与离线计算。</li>
-<li>收集层之上是存储层，这一层除了使用 Kafka 做消息通道之外，还会基于 HDFS 做状态数据存储以及基于 HBase 做维度数据的存储。</li>
-<li>存储层之上是引擎层，包括 Storm 和 Flink。实时计算平台会在引擎层为用户提供一些框架的封装以及公共包和组件的支持。</li>
-<li>在引擎层之上就是平台层了，平台层从数据、任务和资源三个视角去管理。</li>
-<li>架构的最上层是应用层，包括了实时数仓、机器学习、数据同步以及事件驱动应用等。</li>
-</ul>
-        
-          <a class="article-more-a" href="/2021/06/15/flink-plat/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">realtime-platform</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/06/15/flink-plat/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
     </nav>
   
 
@@ -1291,6 +1279,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">spring</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">dw</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">hadoop</a>
               </li>
              
               <li class="article-tag-list-item">
