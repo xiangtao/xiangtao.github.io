@@ -6,15 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://herden.gitee.io">
-  <title>Archives | taox的博客|开发者驿站</title>
+  <title>在线教育数据仓库建设 | taox的博客|开发者驿站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="taox的博客|开发者驿站">
-<meta property="og:url" content="https://herden.gitee.io/archives/index.html">
+  <meta name="description" content="1. 在线教育业务技术介绍2. 数据同步层内容与案例介绍2.1 ODS层介绍ods层，全称operational data store 操作数据存储层。主要作用是存储业务数据库中的原始操作型数据，通过同步工具定时或者实时方式抽取到ods层，进行全量保存。ods层数据一般来说不进行数据清洗，保留和原始数据一样，方便最大化还原原始数据。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在线教育数据仓库建设">
+<meta property="og:url" content="https://herden.gitee.io/2022/05/04/online-edu-dw/index.html">
 <meta property="og:site_name" content="taox的博客|开发者驿站">
+<meta property="og:description" content="1. 在线教育业务技术介绍2. 数据同步层内容与案例介绍2.1 ODS层介绍ods层，全称operational data store 操作数据存储层。主要作用是存储业务数据库中的原始操作型数据，通过同步工具定时或者实时方式抽取到ods层，进行全量保存。ods层数据一般来说不进行数据清洗，保留和原始数据一样，方便最大化还原原始数据。">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-04T08:26:55.000Z">
+<meta property="article:modified_time" content="2022-05-04T11:40:21.663Z">
 <meta property="article:author" content="taox">
-<meta property="article:tag" content="java spring spring-cloud hbase bigdata flink">
+<meta property="article:tag" content="dw">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="taox的博客|开发者驿站" type="application/atom+xml">
@@ -177,38 +181,245 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-online-edu-dw" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      在线教育数据仓库建设
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2022" class="archive-year">2022</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
+
+        
+        
+        <!-- 不蒜子统计 -->
+        <span id="busuanzi_container_page_pv" style='display:none' class="archive-article-date">
+              <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
+        </span>
+
 <a href="/2022/05/04/online-edu-dw/" class="archive-article-date">
   	<time datetime="2022-05-04T08:26:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-05-04</time>
 </a>
 
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2022/05/04/online-edu-dw/">在线教育数据仓库建设</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="1-在线教育业务技术介绍"><a href="#1-在线教育业务技术介绍" class="headerlink" title="1. 在线教育业务技术介绍"></a>1. 在线教育业务技术介绍</h3><h3 id="2-数据同步层内容与案例介绍"><a href="#2-数据同步层内容与案例介绍" class="headerlink" title="2. 数据同步层内容与案例介绍"></a>2. 数据同步层内容与案例介绍</h3><h4 id="2-1-ODS层介绍"><a href="#2-1-ODS层介绍" class="headerlink" title="2.1 ODS层介绍"></a>2.1 ODS层介绍</h4><p>ods层，全称operational data store 操作数据存储层。主要作用是存储业务数据库中的原始操作型数据，通过同步工具定时或者实时方式抽取到ods层，进行全量保存。ods层数据一般来说不进行数据清洗，保留和原始数据一样，方便最大化还原原始数据。</p>
+<span id="more"></span>
+<h4 id="2-2-MySQL上游表schema"><a href="#2-2-MySQL上游表schema" class="headerlink" title="2.2 MySQL上游表schema"></a>2.2 MySQL上游表schema</h4><ul>
+<li><p>线索表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;pe_clue_sale&#96; (</span><br><span class="line">  &#96;dm_id&#96; int(11) NOT NULL AUTO_INCREMENT COMMENT &#39;主键ID&#39;,</span><br><span class="line">  &#96;stud_id&#96; int(11) NOT NULL COMMENT &#39;学员ID&#39;,</span><br><span class="line">  &#96;user_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;学员用户名&#39;,</span><br><span class="line">  &#96;real_name&#96; varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,</span><br><span class="line">  &#96;phone&#96; varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;注册电话&#39;,</span><br><span class="line">  &#96;product_group_id&#96; int(11) DEFAULT NULL COMMENT &#39;产品类别 这里指产品分类（大类）&#39;,</span><br><span class="line">  &#96;product_group_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;产品名称&#39;,</span><br><span class="line">  &#96;pay_status&#96; tinyint(4) DEFAULT NULL COMMENT &#39;订单的支付状态 0 - 未下单  1- 未支付 2 - 已支付&#39;,</span><br><span class="line">  &#96;pay_time&#96; datetime DEFAULT NULL COMMENT &#39;支付时间&#39;,</span><br><span class="line">  &#96;order_time&#96; datetime DEFAULT NULL COMMENT &#39;下单时间&#39;,</span><br><span class="line">  &#96;create_time&#96; datetime DEFAULT NULL COMMENT &#39;创建时间&#39;,</span><br><span class="line">  &#96;old_dm_id&#96; int(11) DEFAULT NULL COMMENT &#39;老线索id&#39;,</span><br><span class="line">  &#96;second_clue_source&#96; int(11) DEFAULT NULL COMMENT &#39;线索二级来源&#39;,</span><br><span class="line">  &#96;clue_source&#96; int(11) DEFAULT NULL COMMENT &#39;1-表单 2-在线咨询 3-手动录入4-官网注册5-微信6-销售活动&#39;,</span><br><span class="line">  &#96;form_id&#96; int(11) DEFAULT NULL COMMENT &#39;表单ID&#39;,</span><br><span class="line">  &#96;pool_index&#96; int(11) NOT NULL COMMENT &#39;线索池标识 &#39;,</span><br><span class="line">  &#96;status&#96; tinyint(1) DEFAULT NULL COMMENT &#39;1 静默  0-非静默 &#39;,</span><br><span class="line">  &#96;ts&#96; datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT &#39;时间戳&#39;,</span><br><span class="line">  &#96;last_follow_sys_id&#96; int(11) DEFAULT NULL COMMENT &#39;上次跟进人&#39;,</span><br><span class="line">  &#96;last_follow_sys_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;上次跟进人姓名&#39;,</span><br><span class="line">  &#96;last_follow_time&#96; datetime DEFAULT NULL COMMENT &#39;上次跟进时间&#39;,</span><br><span class="line">  &#96;country&#96; varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT &#39;&#39; COMMENT &#39;国家编码&#39;,</span><br><span class="line">  &#96;nation_code&#96; varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT &#39;&#39; COMMENT &#39;国际区号&#39;,</span><br><span class="line">  &#96;first_call&#96; datetime DEFAULT NULL COMMENT &#39;首次外呼时间&#39;,</span><br><span class="line">  &#96;clue_status&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索状态:新线索，待跟进， 复活待跟进，跟进中，待支付，已支付，放弃&#39;,</span><br><span class="line">  &#96;data_status&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索数据状态:open，close-won(已支付), close-lost(放弃)&#39;,</span><br><span class="line">  &#96;allocate_status&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索分配状态：1待分配（非系统）、2已分配（系统）、3待分配（系统）、4已分配（人工）&#39;,</span><br><span class="line">  &#96;allocate_time&#96; datetime DEFAULT NULL COMMENT &#39;仅记录最后一次分配的时间&#39;,</span><br><span class="line">  &#96;reservation_time&#96; datetime DEFAULT NULL COMMENT &#39;预约时间&#39;,</span><br><span class="line">  &#96;product_category_id&#96; int(11) DEFAULT NULL COMMENT &#39;产品线id(产品小类id)&#39;,</span><br><span class="line">  &#96;product_category_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;产品线名称(产品小类名称)&#39;,</span><br><span class="line">  &#96;curr_follow_sys_id&#96; int(11) DEFAULT NULL COMMENT &#39;当前跟进人id&#39;,</span><br><span class="line">  &#96;curr_follow_sys_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;当前跟进人姓名&#39;,</span><br><span class="line">  &#96;curr_follow_sys_uid&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;当前跟进人域用户&#39;,</span><br><span class="line">  &#96;curr_follow_dept_id&#96; int(11) DEFAULT NULL COMMENT &#39;当前跟进人部门id&#39;,</span><br><span class="line">  &#96;follow_level&#96; tinyint(4) DEFAULT &#39;1&#39; COMMENT &#39;优先级，默认为1，每增加一个意向，则加1&#39;,</span><br><span class="line">  &#96;close_time&#96; datetime DEFAULT NULL COMMENT &#39;关闭时间&#39;,</span><br><span class="line">  &#96;recover_time&#96; datetime DEFAULT NULL COMMENT &#39;复活时间&#39;,</span><br><span class="line">  &#96;is_del&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;逻辑删除标记&#39;,</span><br><span class="line">  &#96;product_type&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索关联的第一个订单的课程类型，引流课，正价课&#39;,</span><br><span class="line">  &#96;is_resurrect&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;线索复活标记,1是复活过&#39;,</span><br><span class="line">  &#96;last_clue_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;线索放弃之前的状态&#39;,</span><br><span class="line">  &#96;reason&#96; int(10) DEFAULT NULL,</span><br><span class="line">  &#96;is_hand&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;领取方式 0--其他领取 1--手动领取&#39;,</span><br><span class="line">  &#96;star_flag&#96; tinyint(4) DEFAULT NULL COMMENT &#39;售后转售前星标&#39;,</span><br><span class="line">  &#96;rainbow_mark&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;线索彩虹标记，默认0，无标记&#39;,</span><br><span class="line">  &#96;deposit_payment&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;定金支付，默认0，无标记&#39;,</span><br><span class="line">  &#96;rcrai_score&#96; double DEFAULT &#39;0&#39; COMMENT &#39;睿科伦线索评级&#39;,</span><br><span class="line">  &#96;course_price&#96; tinyint(10) DEFAULT &#39;0&#39; COMMENT &#39;课程价格: 0:默认, 1: 0元课, 2: 9.9元课&#39;,</span><br><span class="line">  &#96;server_time_flag&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索服务期标识：默认null，0电销服务期，2学管服务期&#39;,</span><br><span class="line">  &#96;task_pre_create_source&#96; int(11) DEFAULT NULL,</span><br><span class="line">  &#96;receive_sys_id&#96; int(11) DEFAULT NULL COMMENT &#39;手动领取用户id&#39;,</span><br><span class="line">  &#96;receive_date&#96; varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;手动领取日期&#39;,</span><br><span class="line">  &#96;job_num&#96; int(11) DEFAULT &#39;0&#39; COMMENT &#39;工单数&#39;,</span><br><span class="line">  &#96;job_valid_num&#96; int(11) DEFAULT &#39;0&#39; COMMENT &#39;有效工单数&#39;,</span><br><span class="line">  &#96;public_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;公海状态：1首次待分配、2激活待分配、3转派待分配、4放弃待分配、5回收待分配、6已回收、7已放弃、8首次已分配、9激活再分配、10转派再分配、11放弃再分配、12回收再分配、13购课完结、14放弃完结、15回收完结&#39;,</span><br><span class="line">  &#96;private_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;私海状态：1待跟进、2跟进中、3已放弃、4已回收、5已完结&#39;,</span><br><span class="line">  &#96;clue_type&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;线索种类：1新线索、2转派线索、3回收线索、4放弃线索、5完结线索&#39;,</span><br><span class="line">  &#96;clue_score&#96; double DEFAULT &#39;0&#39; COMMENT &#39;线索评分 0~100分&#39;,</span><br><span class="line">  &#96;backup_a&#96; tinyint(4) DEFAULT &#39;-1&#39; COMMENT &#39;洗数据备份字段一&#39;,</span><br><span class="line">  &#96;backup_b&#96; tinyint(4) DEFAULT &#39;-1&#39; COMMENT &#39;洗数据备份字段二&#39;,</span><br><span class="line">  &#96;wx_status&#96; tinyint(4) DEFAULT &#39;-1&#39; COMMENT &#39;加微状态：0已加好友、1未绑定微信、2未加好友&#39;,</span><br><span class="line">  &#96;reserve_type&#96; tinyint(4) DEFAULT NULL COMMENT &#39;预约时间类型 0-自动 1-手动&#39;,</span><br><span class="line">  &#96;hand_wx_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;是否加微：0:未添加，1:已添加&#39;,</span><br><span class="line">  &#96;group_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;是否加群：0:未添加，1:已添加&#39;,</span><br><span class="line">  PRIMARY KEY (&#96;dm_id&#96;),</span><br><span class="line">  KEY &#96;idx_ts&#96; (&#96;ts&#96;) USING BTREE</span><br><span class="line">) ENGINE&#x3D;InnoDB AUTO_INCREMENT&#x3D;1 DEFAULT CHARSET&#x3D;utf8mb4 COLLATE&#x3D;utf8mb4_unicode_ci COMMENT&#x3D;&#39;线索表&#39;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>订单表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;tb_order&#96; (</span><br><span class="line">  &#96;id&#96; int(11) NOT NULL AUTO_INCREMENT,</span><br><span class="line">  &#96;order_no&#96; varchar(50) DEFAULT NULL COMMENT &#39;订单号&#39;,</span><br><span class="line">  &#96;agent_id&#96; varchar(50) DEFAULT NULL COMMENT &#39;代理商id&#39;,</span><br><span class="line">  &#96;agent_new_id&#96; int(11) DEFAULT NULL COMMENT &#39;新代理商系统代理商ID&#39;,</span><br><span class="line">  &#96;agent_account_id&#96; int(11) DEFAULT NULL COMMENT &#39;新代理商系统代理商子账户ID&#39;,</span><br><span class="line">  &#96;agent_account_version_id&#96; int(11) DEFAULT NULL COMMENT &#39;新代理商账户版本Id&#39;,</span><br><span class="line">  &#96;campus_id&#96; int(11) DEFAULT NULL COMMENT &#39;校园代理id&#39;,</span><br><span class="line">  &#96;order_type&#96; tinyint(4) DEFAULT &#39;1&#39; COMMENT &#39;订单类型：1-购买,2-换课购买,3-退课,4-换课退课&#39;,</span><br><span class="line">  &#96;subject_type&#96; tinyint(4) DEFAULT NULL COMMENT &#39;科目类型0-不区分文理,1-文科,2-理科,只针对高考有效&#39;,</span><br><span class="line">  &#96;city&#96; int(11) DEFAULT NULL COMMENT &#39;开通城市代码&#39;,</span><br><span class="line">  &#96;user_id&#96; int(11) DEFAULT NULL COMMENT &#39;用户ID&#39;,</span><br><span class="line">  &#96;status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;订单状态，0：未支付，1：已支付，2:取消&#39;,</span><br><span class="line">  &#96;freeze_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;冻结状态,0-未冻结,1-已冻结&#39;,</span><br><span class="line">  &#96;order_time&#96; datetime DEFAULT NULL COMMENT &#39;下订单时间&#39;,</span><br><span class="line">  &#96;pay_time&#96; datetime DEFAULT NULL COMMENT &#39;订单支付时间&#39;,</span><br><span class="line">  &#96;amount_before&#96; decimal(12,2) DEFAULT NULL COMMENT &#39;订单原金额&#39;,</span><br><span class="line">  &#96;promote_after_amount&#96; decimal(12,2) DEFAULT NULL COMMENT &#39;通过优惠计算后的价格&#39;,</span><br><span class="line">  &#96;amount&#96; decimal(12,2) DEFAULT NULL COMMENT &#39;订单实际付款总金额&#39;,</span><br><span class="line">  &#96;net_value&#96; decimal(12,2) DEFAULT NULL COMMENT &#39;净值&#39;,</span><br><span class="line">  &#96;mix_gold_content&#96; decimal(12,2) DEFAULT &#39;100.00&#39; COMMENT &#39;综合含金量&#39;,</span><br><span class="line">  &#96;discount_id&#96; int(11) DEFAULT NULL COMMENT &#39;促销活动id&#39;,</span><br><span class="line">  &#96;valid_income_percent&#96; tinyint(4) DEFAULT NULL COMMENT &#39;订单可确认含金量【暂时保留】&#39;,</span><br><span class="line">  &#96;product_line&#96; int(11) DEFAULT NULL COMMENT &#39;产品线&#39;,</span><br><span class="line">  &#96;payway_id&#96; int(11) DEFAULT NULL COMMENT &#39;支付方式【支付方式字典表id】&#39;,</span><br><span class="line">  &#96;is_group_pay&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;组合支付方式,0:非组合支付,1:第三方+现金账户,2:第三方+学习卡账户,3:学习卡+现金账户,4:第三方+学习卡账户+现金账户,5:代理商+现金账户&#39;,</span><br><span class="line">  &#96;partner_id&#96; int(11) DEFAULT NULL COMMENT &#39;商户ID&#39;,</span><br><span class="line">  &#96;cancel_type&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;订单取消类型，0：用户操作，1：系跑批取消，2：客服取消&#39;,</span><br><span class="line">  &#96;cancel_time&#96; datetime DEFAULT NULL COMMENT &#39;订单取消时间&#39;,</span><br><span class="line">  &#96;order_source&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;订单来源，0：PC端，1：手机端&#39;,</span><br><span class="line">  &#96;is_basic_order&#96; tinyint(4) DEFAULT &#39;1&#39; COMMENT &#39;是否原单，1：是，0：否&#39;,</span><br><span class="line">  &#96;basic_order_id&#96; int(11) DEFAULT NULL COMMENT &#39;原单id&#39;,</span><br><span class="line">  &#96;is_agent_order&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;是否代理商订单， 0：否 ， 1：是&#39;,</span><br><span class="line">  &#96;is_refunded&#96; int(4) DEFAULT &#39;1&#39; COMMENT &#39;是否已退款，1：否，0：是&#39;,</span><br><span class="line">  &#96;is_changed&#96; int(4) DEFAULT &#39;1&#39; COMMENT &#39;是否发生换课，1：否，0：是&#39;,</span><br><span class="line">  &#96;order_c_place&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;下单场景&#39;,</span><br><span class="line">  &#96;order_channel&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;下单渠道, 0:官网;1:网盟;2:校代;3:天猫; 4:虚拟代理商;5:返点代理商&#39;,</span><br><span class="line">  &#96;order_limit_sign&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;限时标识：0-普通订单，1-限时订单&#39;,</span><br><span class="line">  &#96;order_alliance_sign&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;网盟标识：0-非网盟，1-网盟&#39;,</span><br><span class="line">  &#96;order_shortcut_sign&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;快捷支付标识：0-普通订单，1-快捷支付&#39;,</span><br><span class="line">  &#96;order_overdue_time&#96; datetime DEFAULT NULL COMMENT &#39;过期时间&#39;,</span><br><span class="line">  &#96;ip&#96; varchar(40) DEFAULT NULL COMMENT &#39;ip&#39;,</span><br><span class="line">  &#96;create_time&#96; datetime DEFAULT NULL COMMENT &#39;创建时间&#39;,</span><br><span class="line">  &#96;ts&#96; timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT &#39;时间戳&#39;,</span><br><span class="line">  PRIMARY KEY (&#96;id&#96;),</span><br><span class="line">  UNIQUE KEY &#96;index_unique_order_no&#96; (&#96;order_no&#96;),</span><br><span class="line">  KEY &#96;index_payway_id&#96; (&#96;payway_id&#96;),</span><br><span class="line">  KEY &#96;ts&#96; (&#96;ts&#96;) USING BTREE,</span><br><span class="line">  KEY &#96;agent_new_id_paytiem&#96; (&#96;agent_new_id&#96;,&#96;pay_time&#96;) USING BTREE,</span><br><span class="line">  KEY &#96;index_order_time&#96; (&#96;order_time&#96;)</span><br><span class="line">) ENGINE&#x3D;InnoDB AUTO_INCREMENT&#x3D;1 DEFAULT CHARSET&#x3D;utf8 COMMENT&#x3D;&#39;订单表&#39;	</span><br></pre></td></tr></table></figure>
 
-        <div class="article-info info-on-right">
-          
+</li>
+</ul>
+<h4 id="2-3-案例介绍"><a href="#2-3-案例介绍" class="headerlink" title="2.3 案例介绍"></a>2.3 案例介绍</h4><ol>
+<li><p>ODS表设计<br>ods表数据同步一般分为按天全量同步和按天增量同步，同步的数据存储在hive ods库中,ods表按天进行分区存储。ods表命名规范如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ods.ods_库表_表名_更新周期(day&#x2F;hour)_(da或者di) </span><br><span class="line">da: 表示全量同步</span><br><span class="line">di: 表示整量同步</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>按照全量如何同步数据<br> 比如我们要同步mysql表<strong>crm_sea.pe_clue_sale</strong>到hive ods库<strong>ods_crm_sea_pe_clue_sale_day_da</strong> </p>
+<p>源表结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">    CREATE TABLE &#96;pe_clue_sale&#96; (</span><br><span class="line">  &#96;dm_id&#96; int(11) NOT NULL AUTO_INCREMENT COMMENT &#39;主键ID&#39;,</span><br><span class="line">  &#96;stud_id&#96; int(11) NOT NULL COMMENT &#39;学员ID&#39;,</span><br><span class="line">  &#96;user_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;学员用户名&#39;,</span><br><span class="line">  &#96;real_name&#96; varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,</span><br><span class="line">  &#96;phone&#96; varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;注册电话&#39;,</span><br><span class="line">  &#96;product_group_id&#96; int(11) DEFAULT NULL COMMENT &#39;产品类别 这里指产品分类（大类）&#39;,</span><br><span class="line">  &#96;product_group_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;产品名称&#39;,</span><br><span class="line">  &#96;pay_status&#96; tinyint(4) DEFAULT NULL COMMENT &#39;订单的支付状态 0 - 未下单  1- 未支付 2 - 已支付&#39;,</span><br><span class="line">  &#96;pay_time&#96; datetime DEFAULT NULL COMMENT &#39;支付时间&#39;,</span><br><span class="line">  &#96;order_time&#96; datetime DEFAULT NULL COMMENT &#39;下单时间&#39;,</span><br><span class="line">  &#96;create_time&#96; datetime DEFAULT NULL COMMENT &#39;创建时间&#39;,</span><br><span class="line">  &#96;old_dm_id&#96; int(11) DEFAULT NULL COMMENT &#39;老线索id&#39;,</span><br><span class="line">  &#96;second_clue_source&#96; int(11) DEFAULT NULL COMMENT &#39;线索二级来源&#39;,</span><br><span class="line">  &#96;clue_source&#96; int(11) DEFAULT NULL COMMENT &#39;1-表单 2-在线咨询 3-手动录入4-官网注册5-微信6-销售活动&#39;,</span><br><span class="line">  &#96;form_id&#96; int(11) DEFAULT NULL COMMENT &#39;表单ID&#39;,</span><br><span class="line">  &#96;pool_index&#96; int(11) NOT NULL COMMENT &#39;线索池标识 &#39;,</span><br><span class="line">  &#96;status&#96; tinyint(1) DEFAULT NULL COMMENT &#39;1 静默  0-非静默 &#39;,</span><br><span class="line">  &#96;ts&#96; datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT &#39;时间戳&#39;,</span><br><span class="line">  &#96;last_follow_sys_id&#96; int(11) DEFAULT NULL COMMENT &#39;上次跟进人&#39;,</span><br><span class="line">  &#96;last_follow_sys_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;上次跟进人姓名&#39;,</span><br><span class="line">  &#96;last_follow_time&#96; datetime DEFAULT NULL COMMENT &#39;上次跟进时间&#39;,</span><br><span class="line">  &#96;country&#96; varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT &#39;&#39; COMMENT &#39;国家编码&#39;,</span><br><span class="line">  &#96;nation_code&#96; varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT &#39;&#39; COMMENT &#39;国际区号&#39;,</span><br><span class="line">  &#96;first_call&#96; datetime DEFAULT NULL COMMENT &#39;首次外呼时间&#39;,</span><br><span class="line">  &#96;clue_status&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索状态:新线索，待跟进， 复活待跟进，跟进中，待支付，已支付，放弃&#39;,</span><br><span class="line">  &#96;data_status&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索数据状态:open，close-won(已支付), close-lost(放弃)&#39;,</span><br><span class="line">  &#96;allocate_status&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索分配状态：1待分配（非系统）、2已分配（系统）、3待分配（系统）、4已分配（人工）&#39;,</span><br><span class="line">  &#96;allocate_time&#96; datetime DEFAULT NULL COMMENT &#39;仅记录最后一次分配的时间&#39;,</span><br><span class="line">  &#96;reservation_time&#96; datetime DEFAULT NULL COMMENT &#39;预约时间&#39;,</span><br><span class="line">  &#96;product_category_id&#96; int(11) DEFAULT NULL COMMENT &#39;产品线id(产品小类id)&#39;,</span><br><span class="line">  &#96;product_category_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;产品线名称(产品小类名称)&#39;,</span><br><span class="line">  &#96;curr_follow_sys_id&#96; int(11) DEFAULT NULL COMMENT &#39;当前跟进人id&#39;,</span><br><span class="line">  &#96;curr_follow_sys_name&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;当前跟进人姓名&#39;,</span><br><span class="line">  &#96;curr_follow_sys_uid&#96; varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;当前跟进人域用户&#39;,</span><br><span class="line">  &#96;curr_follow_dept_id&#96; int(11) DEFAULT NULL COMMENT &#39;当前跟进人部门id&#39;,</span><br><span class="line">  &#96;follow_level&#96; tinyint(4) DEFAULT &#39;1&#39; COMMENT &#39;优先级，默认为1，每增加一个意向，则加1&#39;,</span><br><span class="line">  &#96;close_time&#96; datetime DEFAULT NULL COMMENT &#39;关闭时间&#39;,</span><br><span class="line">  &#96;recover_time&#96; datetime DEFAULT NULL COMMENT &#39;复活时间&#39;,</span><br><span class="line">  &#96;is_del&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;逻辑删除标记&#39;,</span><br><span class="line">  &#96;product_type&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索关联的第一个订单的课程类型，引流课，正价课&#39;,</span><br><span class="line">  &#96;is_resurrect&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;线索复活标记,1是复活过&#39;,</span><br><span class="line">  &#96;last_clue_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;线索放弃之前的状态&#39;,</span><br><span class="line">  &#96;reason&#96; int(10) DEFAULT NULL,</span><br><span class="line">  &#96;is_hand&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;领取方式 0--其他领取 1--手动领取&#39;,</span><br><span class="line">  &#96;star_flag&#96; tinyint(4) DEFAULT NULL COMMENT &#39;售后转售前星标&#39;,</span><br><span class="line">  &#96;rainbow_mark&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;线索彩虹标记，默认0，无标记&#39;,</span><br><span class="line">  &#96;deposit_payment&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;定金支付，默认0，无标记&#39;,</span><br><span class="line">  &#96;rcrai_score&#96; double DEFAULT &#39;0&#39; COMMENT &#39;睿科伦线索评级&#39;,</span><br><span class="line">  &#96;course_price&#96; tinyint(10) DEFAULT &#39;0&#39; COMMENT &#39;课程价格: 0:默认, 1: 0元课, 2: 9.9元课&#39;,</span><br><span class="line">  &#96;server_time_flag&#96; tinyint(4) DEFAULT NULL COMMENT &#39;线索服务期标识：默认null，0电销服务期，2学管服务期&#39;,</span><br><span class="line">  &#96;task_pre_create_source&#96; int(11) DEFAULT NULL,</span><br><span class="line">  &#96;receive_sys_id&#96; int(11) DEFAULT NULL COMMENT &#39;手动领取用户id&#39;,</span><br><span class="line">  &#96;receive_date&#96; varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT &#39;手动领取日期&#39;,</span><br><span class="line">  &#96;job_num&#96; int(11) DEFAULT &#39;0&#39; COMMENT &#39;工单数&#39;,</span><br><span class="line">  &#96;job_valid_num&#96; int(11) DEFAULT &#39;0&#39; COMMENT &#39;有效工单数&#39;,</span><br><span class="line">  &#96;public_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;公海状态：1首次待分配、2激活待分配、3转派待分配、4放弃待分配、5回收待分配、6已回收、7已放弃、8首次已分配、9激活再分配、10转派再分配、11放弃再分配、12回收再分配、13购课完结、14放弃完结、15回收完结&#39;,</span><br><span class="line">  &#96;private_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;私海状态：1待跟进、2跟进中、3已放弃、4已回收、5已完结&#39;,</span><br><span class="line">  &#96;clue_type&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;线索种类：1新线索、2转派线索、3回收线索、4放弃线索、5完结线索&#39;,</span><br><span class="line">  &#96;clue_score&#96; double DEFAULT &#39;0&#39; COMMENT &#39;线索评分 0~100分&#39;,</span><br><span class="line">  &#96;backup_a&#96; tinyint(4) DEFAULT &#39;-1&#39; COMMENT &#39;洗数据备份字段一&#39;,</span><br><span class="line">  &#96;backup_b&#96; tinyint(4) DEFAULT &#39;-1&#39; COMMENT &#39;洗数据备份字段二&#39;,</span><br><span class="line">  &#96;wx_status&#96; tinyint(4) DEFAULT &#39;-1&#39; COMMENT &#39;加微状态：0已加好友、1未绑定微信、2未加好友&#39;,</span><br><span class="line">  &#96;reserve_type&#96; tinyint(4) DEFAULT NULL COMMENT &#39;预约时间类型 0-自动 1-手动&#39;,</span><br><span class="line">  &#96;hand_wx_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;是否加微：0:未添加，1:已添加&#39;,</span><br><span class="line">  &#96;group_status&#96; tinyint(4) DEFAULT &#39;0&#39; COMMENT &#39;是否加群：0:未添加，1:已添加&#39;,</span><br><span class="line">  PRIMARY KEY (&#96;dm_id&#96;),</span><br><span class="line">  KEY &#96;idx_ts&#96; (&#96;ts&#96;) USING BTREE</span><br><span class="line">) ENGINE&#x3D;InnoDB AUTO_INCREMENT&#x3D;1 DEFAULT CHARSET&#x3D;utf8mb4 COLLATE&#x3D;utf8mb4_unicode_ci COMMENT&#x3D;&#39;线索表&#39;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>目标hive表结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">CREATE EXTERNAL TABLE &#96;ods.ods_crm_sea_pe_clue_sale_day_da&#96;(</span><br><span class="line">&#96;dm_id&#96; int COMMENT &#39;主键ID&#39;,	</span><br><span class="line">&#96;stud_id&#96; int COMMENT &#39;学员ID&#39;,	</span><br><span class="line">&#96;user_name&#96; string COMMENT &#39;学员用户名&#39;,	</span><br><span class="line">&#96;real_name&#96; string COMMENT &#39;&#39;,	</span><br><span class="line">&#96;phone&#96; string COMMENT &#39;注册电话&#39;,	</span><br><span class="line">&#96;product_group_id&#96; int COMMENT &#39;产品类别 这里指产品分类（大类）&#39;,	</span><br><span class="line">&#96;product_group_name&#96; string COMMENT &#39;产品名称&#39;,	</span><br><span class="line">&#96;pay_status&#96; int COMMENT &#39;订单的支付状态 0 - 未下单  1- 未支付 2 - 已支付&#39;,	</span><br><span class="line">&#96;pay_time&#96; timestamp COMMENT &#39;支付时间&#39;,	</span><br><span class="line">&#96;order_time&#96; timestamp COMMENT &#39;下单时间&#39;,	</span><br><span class="line">&#96;create_time&#96; timestamp COMMENT &#39;创建时间&#39;,	</span><br><span class="line">&#96;old_dm_id&#96; int COMMENT &#39;老线索id&#39;,	</span><br><span class="line">&#96;second_clue_source&#96; int COMMENT &#39;线索二级来源&#39;,	</span><br><span class="line">&#96;clue_source&#96; int COMMENT &#39;1-表单 2-在线咨询 3-手动录入4-官网注册5-微信6-销售活动&#39;,	</span><br><span class="line">&#96;form_id&#96; int COMMENT &#39;表单ID&#39;,	</span><br><span class="line">&#96;pool_index&#96; int COMMENT &#39;线索池标识 &#39;,	</span><br><span class="line">&#96;status&#96; int COMMENT &#39;1 静默  0-非静默 &#39;,	</span><br><span class="line">&#96;ts&#96; timestamp COMMENT &#39;时间戳&#39;,	</span><br><span class="line">&#96;last_follow_sys_id&#96; int COMMENT &#39;上次跟进人&#39;,	</span><br><span class="line">&#96;last_follow_sys_name&#96; string COMMENT &#39;上次跟进人姓名&#39;,	</span><br><span class="line">&#96;last_follow_time&#96; timestamp COMMENT &#39;上次跟进时间&#39;,	</span><br><span class="line">&#96;country&#96; string COMMENT &#39;国家编码&#39;,	</span><br><span class="line">&#96;nation_code&#96; string COMMENT &#39;国际区号&#39;,	</span><br><span class="line">&#96;first_call&#96; timestamp COMMENT &#39;首次外呼时间&#39;,	</span><br><span class="line">&#96;clue_status&#96; int COMMENT &#39;线索状态:新线索，待跟进， 复活待跟进，跟进中，待支付，已支付，放弃&#39;,	</span><br><span class="line">&#96;data_status&#96; int COMMENT &#39;线索数据状态:open，close-won(已支付), close-lost(放弃)&#39;,	</span><br><span class="line">&#96;allocate_status&#96; int COMMENT &#39;线索分配状态：1待分配（非系统）、2已分配（系统）、3待分配（系统）、4已分配（人工）&#39;,	</span><br><span class="line">&#96;allocate_time&#96; timestamp COMMENT &#39;仅记录最后一次分配的时间&#39;,	</span><br><span class="line">&#96;reservation_time&#96; timestamp COMMENT &#39;预约时间&#39;,	</span><br><span class="line">&#96;product_category_id&#96; int COMMENT &#39;产品线id(产品小类id)&#39;,	</span><br><span class="line">&#96;product_category_name&#96; string COMMENT &#39;产品线名称(产品小类名称)&#39;,	</span><br><span class="line">&#96;curr_follow_sys_id&#96; int COMMENT &#39;当前跟进人id&#39;,	</span><br><span class="line">&#96;curr_follow_sys_name&#96; string COMMENT &#39;当前跟进人姓名&#39;,	</span><br><span class="line">&#96;curr_follow_sys_uid&#96; string COMMENT &#39;当前跟进人域用户&#39;,	</span><br><span class="line">&#96;curr_follow_dept_id&#96; int COMMENT &#39;当前跟进人部门id&#39;,	</span><br><span class="line">&#96;follow_level&#96; int COMMENT &#39;优先级，默认为1，每增加一个意向，则加1&#39;,	</span><br><span class="line">&#96;close_time&#96; timestamp COMMENT &#39;关闭时间&#39;,	</span><br><span class="line">&#96;recover_time&#96; timestamp COMMENT &#39;复活时间&#39;,	</span><br><span class="line">&#96;is_del&#96; int COMMENT &#39;逻辑删除标记&#39;,	</span><br><span class="line">&#96;product_type&#96; int COMMENT &#39;线索关联的第一个订单的课程类型，引流课，正价课&#39;,	</span><br><span class="line">&#96;is_resurrect&#96; int COMMENT &#39;线索复活标记,1是复活过&#39;,	</span><br><span class="line">&#96;last_clue_status&#96; int COMMENT &#39;线索放弃之前的状态&#39;,	</span><br><span class="line">&#96;reason&#96; int COMMENT &#39;&#39;,	</span><br><span class="line">&#96;is_hand&#96; int COMMENT &#39;领取方式 0--其他领取 1--手动领取&#39;,	</span><br><span class="line">&#96;star_flag&#96; int COMMENT &#39;售后转售前星标&#39;,	</span><br><span class="line">&#96;rainbow_mark&#96; int COMMENT &#39;线索彩虹标记，默认0，无标记&#39;,	</span><br><span class="line">&#96;deposit_payment&#96; int COMMENT &#39;定金支付，默认0，无标记&#39;,	</span><br><span class="line">&#96;rcrai_score&#96; double COMMENT &#39;睿科伦线索评级&#39;,	</span><br><span class="line">&#96;course_price&#96; int COMMENT &#39;课程价格: 0:默认, 1: 0元课, 2: 9.9元课&#39;,	</span><br><span class="line">&#96;server_time_flag&#96; int COMMENT &#39;线索服务期标识：默认null，0电销服务期，2学管服务期&#39;,	</span><br><span class="line">&#96;task_pre_create_source&#96; int COMMENT &#39;&#39;,	</span><br><span class="line">&#96;receive_sys_id&#96; int COMMENT &#39;手动领取用户id&#39;,	</span><br><span class="line">&#96;receive_date&#96; string COMMENT &#39;手动领取日期&#39;,	</span><br><span class="line">&#96;job_num&#96; int COMMENT &#39;工单数&#39;,	</span><br><span class="line">&#96;job_valid_num&#96; int COMMENT &#39;有效工单数&#39;,	</span><br><span class="line">&#96;public_status&#96; int COMMENT &#39;公海状态：1首次待分配、2激活待分配、3转派待分配、4放弃待分配、5回收待分配、6已回收、7已放弃、8首次已分配、9激活再分配、10转派再分配、11放弃再分配、12回收再分配、13购课完结、14放弃完结、15回收完结&#39;,	</span><br><span class="line">&#96;private_status&#96; int COMMENT &#39;私海状态：1待跟进、2跟进中、3已放弃、4已回收、5已完结&#39;,	</span><br><span class="line">&#96;clue_type&#96; int COMMENT &#39;线索种类：1新线索、2转派线索、3回收线索、4放弃线索、5完结线索&#39;,	</span><br><span class="line">&#96;clue_score&#96; double COMMENT &#39;线索评分 0~100分&#39;,	</span><br><span class="line">&#96;backup_a&#96; int COMMENT &#39;洗数据备份字段一&#39;,	</span><br><span class="line">&#96;backup_b&#96; int COMMENT &#39;洗数据备份字段二&#39;,	</span><br><span class="line">&#96;wx_status&#96; int COMMENT &#39;加微状态：0已加好友、1未绑定微信、2未加好友&#39;,	</span><br><span class="line">&#96;reserve_type&#96; int COMMENT &#39;预约时间类型 0-自动 1-手动&#39;,	</span><br><span class="line">&#96;hand_wx_status&#96; int COMMENT &#39;是否加微：0:未添加，1:已添加&#39;,	</span><br><span class="line">&#96;group_status&#96; int COMMENT &#39;是否加群：0:未添加，1:已添加&#39;)	</span><br><span class="line">COMMENT &#39;销售&amp;全量&#39;	</span><br><span class="line">PARTITIONED BY (	</span><br><span class="line">&#96;dt&#96; string)	</span><br><span class="line">ROW FORMAT SERDE	</span><br><span class="line">&#39;org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe&#39;	</span><br><span class="line">WITH SERDEPROPERTIES (	</span><br><span class="line">&#39;field.delim&#39;&#x3D;&#39;\u0001&#39;,	</span><br><span class="line">&#39;serialization.format&#39;&#x3D;&#39;\u0001&#39;)	</span><br><span class="line">STORED AS INPUTFORMAT	</span><br><span class="line">&#39;org.apache.hadoop.mapred.TextInputFormat&#39;	</span><br><span class="line">OUTPUTFORMAT	</span><br><span class="line">&#39;org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat&#39;</span><br><span class="line">LOCATION	</span><br><span class="line">&#39;hdfs:&#x2F;&#x2F;nstest&#x2F;input&#x2F;hive&#x2F;warehouse&#x2F;ods.db&#x2F;ods_crm_sea_pe_clue_sale_day_da&#39;	</span><br></pre></td></tr></table></figure>
+
+<p> 注意目标表按照dt分区<br> 最后我们使用sqoop工具进行数据同步，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqoop import   --connect &#39;jdbc:mysql:&#x2F;&#x2F;host:3018&#x2F;crm_sea?tinyInt1isBit&#x3D;false&amp;zeroDateTimeBehavior&#x3D;convertToNull&#39;   --username xxx   --password &#39;xxx&#39;   --query &quot;select \&#96;dm_id\&#96;,\&#96;stud_id\&#96;,\&#96;user_name\&#96;,\&#96;real_name\&#96;,\&#96;phone\&#96;,\&#96;product_group_id\&#96;,\&#96;product_group_name\&#96;,\&#96;pay_status\&#96;,\&#96;pay_time\&#96;,\&#96;order_time\&#96;,\&#96;create_time\&#96;,\&#96;old_dm_id\&#96;,\&#96;second_clue_source\&#96;,\&#96;clue_source\&#96;,\&#96;form_id\&#96;,\&#96;pool_index\&#96;,\&#96;status\&#96;,\&#96;ts\&#96;,\&#96;last_follow_sys_id\&#96;,\&#96;last_follow_sys_name\&#96;,\&#96;last_follow_time\&#96;,\&#96;country\&#96;,\&#96;nation_code\&#96;,\&#96;first_call\&#96;,\&#96;clue_status\&#96;,\&#96;data_status\&#96;,\&#96;allocate_status\&#96;,\&#96;allocate_time\&#96;,\&#96;reservation_time\&#96;,\&#96;product_category_id\&#96;,\&#96;product_category_name\&#96;,\&#96;curr_follow_sys_id\&#96;,\&#96;curr_follow_sys_name\&#96;,\&#96;curr_follow_sys_uid\&#96;,\&#96;curr_follow_dept_id\&#96;,\&#96;follow_level\&#96;,\&#96;close_time\&#96;,\&#96;recover_time\&#96;,\&#96;is_del\&#96;,\&#96;product_type\&#96;,\&#96;is_resurrect\&#96;,\&#96;last_clue_status\&#96;,\&#96;reason\&#96;,\&#96;is_hand\&#96;,\&#96;star_flag\&#96;,\&#96;rainbow_mark\&#96;,\&#96;deposit_payment\&#96;,\&#96;rcrai_score\&#96;,\&#96;course_price\&#96;,\&#96;server_time_flag\&#96;,\&#96;task_pre_create_source\&#96;,\&#96;receive_sys_id\&#96;,\&#96;receive_date\&#96;,\&#96;job_num\&#96;,\&#96;job_valid_num\&#96;,\&#96;public_status\&#96;,\&#96;private_status\&#96;,\&#96;clue_type\&#96;,\&#96;clue_score\&#96;,\&#96;backup_a\&#96;,\&#96;backup_b\&#96;,\&#96;wx_status\&#96;,\&#96;reserve_type\&#96;,\&#96;hand_wx_status\&#96;,\&#96;group_status\&#96; from crm_sea.pe_clue_sale where \$CONDITIONS&quot;   --fields-terminated-by &#39;\001&#39;   --lines-terminated-by &#39;\n&#39;   --null-string &#39;\\N&#39;   --null-non-string &#39;\\N&#39;   --hive-drop-import-delims   --target-dir &#x2F;input&#x2F;hive&#x2F;warehouse&#x2F;ods.db&#x2F;ods_crm_sea_pe_clue_sale_day_da&#x2F;2022&#x2F;05&#x2F;03&#x2F;   --mapreduce-job-name ods_crm_sea_pe_clue_sale   -class-name ods_crm_sea_pe_clue_sale --append --split-by dm_id -m 10</span><br></pre></td></tr></table></figure>
+
+<p>最后，我们添加表分区，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter table ods.ods_crm_sea_pe_clue_sale_day_da add if not exists partition (dt &#x3D; &#39;20220503&#39;) location &#39;&#x2F;input&#x2F;hive&#x2F;warehouse&#x2F;ods.db&#x2F;ods_crm_sea_pe_clue_sale_day_da&#x2F;2022&#x2F;05&#x2F;03&#x2F;&#39;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>按照增量如何同步数据<br>增量同步适用于源表数据量比较大的情况（一般千万以上），这时如果每天都全量同步的话，一个是同步时间会很慢，另外同步的时候对于mysql服务io压力是比较大的。所以，这时需要增量同步。<br>比如：要同步mysql表<strong>db_order.tb_order</strong>到<strong>ods.ods_db_order_tb_order_day_di</strong>，我们才用增量的方式<br>sqoop同步语句如下：  </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">sqoop import --connect $mysql_db_url  --query &quot;select </span><br><span class="line">id</span><br><span class="line">,order_no</span><br><span class="line">,agent_id</span><br><span class="line">,agent_new_id</span><br><span class="line">,agent_account_id</span><br><span class="line">,agent_account_version_id</span><br><span class="line">,campus_id</span><br><span class="line">,order_type</span><br><span class="line">,subject_type</span><br><span class="line">,city</span><br><span class="line">,user_id</span><br><span class="line">,status</span><br><span class="line">,freeze_status</span><br><span class="line">,order_time</span><br><span class="line">,pay_time</span><br><span class="line">,amount_before</span><br><span class="line">,promote_after_amount</span><br><span class="line">,amount</span><br><span class="line">,net_value</span><br><span class="line">,mix_gold_content</span><br><span class="line">,discount_id</span><br><span class="line">,valid_income_percent</span><br><span class="line">,product_line</span><br><span class="line">,payway_id</span><br><span class="line">,is_group_pay</span><br><span class="line">,partner_id</span><br><span class="line">,cancel_type</span><br><span class="line">,cancel_time</span><br><span class="line">,order_source</span><br><span class="line">,is_basic_order</span><br><span class="line">,basic_order_id</span><br><span class="line">,is_agent_order</span><br><span class="line">,is_refunded</span><br><span class="line">,is_changed</span><br><span class="line">,order_c_place</span><br><span class="line">,order_limit_sign</span><br><span class="line">,order_alliance_sign</span><br><span class="line">,order_shortcut_sign</span><br><span class="line">,order_overdue_time</span><br><span class="line">,ip</span><br><span class="line">,create_time</span><br><span class="line">,ts</span><br><span class="line">,order_channel</span><br><span class="line">from db_order.tb_order</span><br><span class="line">where ts &gt;&#x3D; &#39;2022-05-03 00:00:00&#39;  </span><br><span class="line">and 1&#x3D;1 &quot; --fields-terminated-by &#39;\001&#39; --lines-terminated-by &#39;\n&#39; --null-string &#39;\\N&#39; --null-non-string &#39;\\N&#39; -m 1 --hive-drop-import-delims  --target-dir &#x2F;input&#x2F;hive&#x2F;warehouse&#x2F;ods.db&#x2F;ods_db_order_tb_order_day_di&#x2F;2022&#x2F;05&#x2F;03&#x2F;</span><br><span class="line">&#96;&#96;&#96;  </span><br><span class="line">注意，这里需要使用源表里的增量时间字段ts来限定数据范围，每次我们都同步大于昨天的数据</span><br><span class="line"></span><br><span class="line">最后添加分区数据：</span><br></pre></td></tr></table></figure>
+<p>ALTER TABLE ods.ods_db_order_tb_order_day_di ADD if not exists PARTITION (dt=’20220503’) LOCATION ‘/input/hive/warehouse/ods.db/ods_db_order_tb_order_day_di/2022/05/03/‘</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">由于，同步到的hive ods表是按天增量数据，不方便查询全量数据，所以，我们需要在ods表上加一个整合的全量表,我们称之为mid表，如：**mid_db_order_tb_order** </span><br><span class="line">实现逻辑如下： </span><br></pre></td></tr></table></figure>
+<p>– 抽取前天mid全量数据和ods今天新增数据(只有新增数据)<br>use ods;<br>– 插入物理表<br>INSERT OVERWRITE TABLE mid.mid_db_order_tb_order PARTITION (dt=’${hivevar:dt}’)<br>SELECT  id<br>       ,order_no<br>       ,agent_id<br>       ,agent_new_id<br>       ,agent_account_id<br>       ,agent_account_version_id<br>       ,campus_id<br>       ,order_type<br>       ,subject_type<br>       ,city<br>       ,user_id<br>       ,status<br>       ,freeze_status<br>       ,order_time<br>       ,pay_time<br>       ,amount_before<br>       ,promote_after_amount<br>       ,amount<br>       ,net_value<br>       ,mix_gold_content<br>       ,discount_id<br>       ,valid_income_percent<br>       ,product_line<br>       ,payway_id<br>       ,is_group_pay<br>       ,partner_id<br>       ,cancel_type<br>       ,cancel_time<br>       ,order_source<br>       ,is_basic_order<br>       ,basic_order_id<br>       ,is_agent_order<br>       ,is_refunded<br>       ,is_changed<br>       ,order_c_place<br>       ,order_limit_sign<br>       ,order_alliance_sign<br>       ,order_shortcut_sign<br>       ,order_overdue_time<br>       ,ip<br>       ,create_time<br>       ,ts<br>       ,order_channel<br>FROM<br>(<br>    SELECT  id<br>           ,order_no<br>           ,agent_id<br>           ,agent_new_id<br>           ,agent_account_id<br>           ,agent_account_version_id<br>           ,campus_id<br>           ,order_type<br>           ,subject_type<br>           ,city<br>           ,user_id<br>           ,status<br>           ,freeze_status<br>           ,order_time<br>           ,pay_time<br>           ,amount_before<br>           ,promote_after_amount<br>           ,amount<br>           ,net_value<br>           ,mix_gold_content<br>           ,discount_id<br>           ,valid_income_percent<br>           ,product_line<br>           ,payway_id<br>           ,is_group_pay<br>           ,partner_id<br>           ,cancel_type<br>           ,cancel_time<br>           ,order_source<br>           ,is_basic_order<br>           ,basic_order_id<br>           ,is_agent_order<br>           ,is_refunded<br>           ,is_changed<br>           ,order_c_place<br>           ,order_limit_sign<br>           ,order_alliance_sign<br>           ,order_shortcut_sign<br>           ,order_overdue_time<br>           ,ip<br>           ,create_time<br>           ,ts<br>           ,order_channel<br>           ,row_number() over(partition by order_no ORDER BY ts desc) rank<br>    FROM<br>    (<br>        SELECT  id<br>               ,order_no<br>               ,agent_id<br>               ,agent_new_id<br>               ,agent_account_id<br>               ,agent_account_version_id<br>               ,campus_id<br>               ,order_type<br>               ,subject_type<br>               ,city<br>               ,user_id<br>               ,status<br>               ,freeze_status<br>               ,order_time<br>               ,pay_time<br>               ,amount_before<br>               ,promote_after_amount<br>               ,amount<br>               ,net_value<br>               ,mix_gold_content<br>               ,discount_id<br>               ,valid_income_percent<br>               ,product_line<br>               ,payway_id<br>               ,is_group_pay<br>               ,partner_id<br>               ,cancel_type<br>               ,cancel_time<br>               ,order_source<br>               ,is_basic_order<br>               ,basic_order_id<br>               ,is_agent_order<br>               ,is_refunded<br>               ,is_changed<br>               ,order_c_place<br>               ,order_limit_sign<br>               ,order_alliance_sign<br>               ,order_shortcut_sign<br>               ,order_overdue_time<br>               ,ip<br>               ,create_time<br>               ,ts<br>               ,order_channel<br>        FROM mid.mid_db_order_tb_order<br>        WHERE dt =’${hivevar:dt_date1}’<br>        UNION ALL<br>        SELECT  id<br>               ,order_no<br>               ,agent_id<br>               ,agent_new_id<br>               ,agent_account_id<br>               ,agent_account_version_id<br>               ,campus_id<br>               ,order_type<br>               ,subject_type<br>               ,city<br>               ,user_id<br>               ,status<br>               ,freeze_status<br>               ,order_time<br>               ,pay_time<br>               ,amount_before<br>               ,promote_after_amount<br>               ,amount<br>               ,net_value<br>               ,mix_gold_content<br>               ,discount_id<br>               ,valid_income_percent<br>               ,product_line<br>               ,payway_id<br>               ,is_group_pay<br>               ,partner_id<br>               ,cancel_type<br>               ,cancel_time<br>               ,order_source<br>               ,is_basic_order<br>               ,basic_order_id<br>               ,is_agent_order<br>               ,is_refunded<br>               ,is_changed<br>               ,order_c_place<br>               ,order_limit_sign<br>               ,order_alliance_sign<br>               ,order_shortcut_sign<br>               ,order_overdue_time<br>               ,ip<br>               ,create_time<br>               ,ts<br>               ,order_channel<br>        FROM ods.ods_db_order_tb_order<br>        WHERE dt =’${hivevar:dt}’<br>        UNION ALL<br>        SELECT  id<br>               ,order_no<br>               ,agent_id<br>               ,agent_new_id<br>               ,agent_account_id<br>               ,agent_account_version_id<br>               ,campus_id<br>               ,order_type<br>               ,subject_type<br>               ,city<br>               ,user_id<br>               ,status<br>               ,freeze_status<br>               ,order_time<br>               ,pay_time<br>               ,amount_before<br>               ,promote_after_amount<br>               ,amount<br>               ,net_value<br>               ,mix_gold_content<br>               ,discount_id<br>               ,valid_income_percent<br>               ,product_line<br>               ,payway_id<br>               ,is_group_pay<br>               ,partner_id<br>               ,cancel_type<br>               ,cancel_time<br>               ,order_source<br>               ,is_basic_order<br>               ,basic_order_id<br>               ,is_agent_order<br>               ,is_refunded<br>               ,is_changed<br>               ,order_c_place<br>               ,order_limit_sign<br>               ,order_alliance_sign<br>               ,order_shortcut_sign<br>               ,order_overdue_time<br>               ,ip<br>               ,create_time<br>               ,ts<br>               ,order_channel<br>        FROM ods.ods_db_trade_order_tb_order_di<br>        WHERE dt =’${hivevar:dt}’<br>    )a<br>)b<br>WHERE rank=1 ;<br>– 最后因为mid层数据量很大，我们只保留3天的分区，删除三天前的分区<br>alter table mid.mid_db_order_tb_order drop IF EXISTS partition (dt=’${hivevar:dt_date3}’);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 3. 数据明细层（ＤＷＤ层）按照主题划分</span><br><span class="line"></span><br><span class="line">#### 3.1 DWD层主题划分</span><br><span class="line">dwd明细层，主要是按照业务过程进行主题域划分，对于在线教育，我们一般会划分为如下几个主题：</span><br><span class="line">- 流量（bhv）、销售(sales)、用户(user)、产品(product)、授课(lesson)、咨询(consult)、投放(put) 七个主题域 </span><br><span class="line">- 按照主题域进行维度建模及多维分析形成汇总数据主题表</span><br><span class="line"></span><br><span class="line">#### 3.2 案例介绍</span><br><span class="line">##### 如何构建出销售主题的明细表</span><br><span class="line">dwd_sales_order_product_detail: 订单产品明细表	,主要包含订单相关信息：订单产品的销售信息，包含用户、支付时间、支付金额、净值等  </span><br><span class="line">这个表的构建的SQL代码如下：</span><br></pre></td></tr></table></figure>
+<p>set hive.auto.convert.join=true;<br>set hive.exec.parallel=true;<br>set hive.exec.parallel.thread.number=13;<br>set hive.exec.reducers.bytes.per.reducer=512000000;</p>
+<p>use bdp_tmp;<br>DROP TABLE IF EXISTS dwd_sales_order_product_detail_temp;<br>CREATE TABLE dwd_sales_order_product_detail_temp AS<br>select<br>    t1.order_no as order_no<br>    ,t2.product_id as product_id<br>    ,t1.id as order_id<br>    ,t2.exam_season_id<br>    ,t2.price<br>    ,t2.product_type<br>    ,t2.product_name<br>    ,t2.promote_after_amount as op_promote_after_amt<br>    ,t2.discount_price as op_discount_price<br>    ,t2.net_value as op_net_value<br>    ,t2.cost_price as op_cost_price<br>    ,t2.discount_item_id<br>    ,t2.buy_num<br>    ,t2.product_status<br>    ,t2.end_time<br>    ,t2.is_give_product<br>    ,t2.create_time as op_create_time</p>
+<pre><code>,t1.agent_id as agent_id
+,t1.agent_new_id as agent_new_id
+,t1.agent_account_id as agent_account_id
+,t1.agent_account_version_id as agent_account_version_id
+,t1.campus_id
+,t1.order_type
+,t1.subject_type
+,t1.city as city_id
+,t1.user_id
+,t1.status as order_status
+,t1.freeze_status as freeze_status
+,t1.order_time
+,t1.pay_time
+,t1.amount_before as order_amt -- 订单原金额
+,t1.promote_after_amount as promote_after_amt --通过优惠计算后的价格
+,t1.amount as order_pay_amt -- 订单实付金额
+,t1.net_value as order_net_value
+,t1.mix_gold_content
+,t1.discount_id
+,t1.product_line
+,t1.payway_id
+,t1.is_group_pay
+,t1.partner_id
+,t1.cancel_type
+,t1.cancel_time
+,t1.order_source as order_fputype_code
+,t1.is_basic_order
+,t1.basic_order_id
+,t1.is_agent_order
+,t1.is_refunded
+,t1.is_changed
+,t1.order_c_place
+,t1.order_limit_sign
+,t1.order_alliance_sign
+,t1.order_shortcut_sign
+,t1.order_overdue_time
+,t1.ip
+,t1.order_channel
+
+,t6.resubmit_path
+,t2.finance_version
+,t6.referrer
+
+,t5.kid
+,t5.alliance_id as aid
+,t5.last_alliance_id as last_aid
+,t5.last_kid
+,case when t2.discount_recall = 1 and t1.order_type = 4 then 2 -- 退费重算-H单
+      when t2.discount_recall = 1 then 3 -- 退费重算-新单
+ else 0 end discount_recall -- 退费重算标识
+,case when t6.order_source  in (&#39;K12_xg_nblz_xslz111963&#39;,&#39;K12_xg_nblz_xslz111961&#39;,&#39;K12_xg_nblz_xslz111962&#39;) then &#39;1&#39;
+      when t6.order_source  in (&#39;K12_wzqd_zr_dswap136402&#39;) then &#39;2&#39;
+      when t1.order_no like &#39;%SG%&#39; then &#39;1&#39;
+      when t1.order_no like &#39;%V_GIFT%&#39; then &#39;2&#39;
+ else &#39;0&#39; end as order_class_type
+
+
+
+,t6.order_source as put_source_channel  -- 投放来源渠道
+</code></pre>
+<p>from<br>(<br>        select  *<br>        from mid.mid_db_order_tb_order<br>        where dt=’${hivevar:dt}’<br>)t1<br>join<br>(<br>        select<br>            order_no<br>            ,product_id<br>            ,product_line<br>            ,exam_season_id<br>            ,price<br>            ,product_type<br>            ,product_name<br>            ,promote_after_amount<br>            ,discount_price<br>            ,net_value<br>            ,cost_price<br>            ,discount_item_id<br>            ,partner_id<br>            ,buy_num<br>            ,product_status<br>            ,end_time<br>            ,is_give_product<br>            ,create_time<br>            ,finance_version<br>            ,get_json_object(extend_info,’$.discountRecall’) discount_recall<br>        from mid.mid_db_order_tb_order_product<br>        where dt=’${hivevar:dt}’<br>)t2 on t1.order_no=t2.order_no</p>
+<p>LEFT JOIN<br>(<br>        SELECT  order_no<br>               ,kid<br>               ,alliance_id<br>               ,last_alliance_id<br>               ,last_kid<br>        FROM mid.mid_db_trade_order_tb_order_alliance<br>        WHERE dt=’${hivevar:dt}’<br>)t5 on t1.order_no=t5.order_no<br>left join<br>(<br>    SELECT  user_id – 用户ID<br>           ,order_no – 订单ID<br>           ,CASE WHEN get_json_object(extend_param,’$.resubmit_path’) is not null THEN get_json_object(extend_param,’$.resubmit_path’)  ELSE order_source END AS resubmit_path – 渠道<br>           ,referrer – URL<br>           ,order_source – 投放渠道来源<br>    FROM mid.mid_db_order_pe_order_extend_info<br>    WHERE dt = ‘${hivevar:dt}’<br>)t6 on t1.user_id = t6.user_id and t1.order_no = t6.order_no<br>;<br>INSERT OVERWRITE TABLE dwd.dwd_sales_order_product_detail_da PARTITION (dt=’${hivevar:dt}’)<br>select<br>    order_no<br>    ,a.product_id<br>    ,order_id<br>    ,exam_season_id<br>    ,price<br>    ,product_type<br>    ,product_name<br>    ,op_promote_after_amt<br>    ,op_discount_price<br>    ,op_net_value<br>    ,op_cost_price<br>    ,discount_item_id<br>    ,buy_num<br>    ,product_status<br>    ,end_time<br>    ,is_give_product<br>    ,op_create_time</p>
+<pre><code>,agent_id
+,agent_new_id
+,agent_account_id
+,agent_account_version_id
+,campus_id
+,order_type
+,subject_type
+,city_id
+,user_id
+,order_status
+,freeze_status
+,order_time
+,pay_time
+,order_amt -- 订单原金额
+,promote_after_amt --通过优惠计算后的价格
+,order_pay_amt -- 订单实付金额
+,order_net_value
+,mix_gold_content
+,discount_id
+,product_line
+,payway_id
+,is_group_pay
+,partner_id
+,cancel_type
+,cancel_time
+,order_fputype_code
+,is_basic_order
+,a.basic_order_id
+,is_agent_order
+,is_refunded
+,is_changed
+,order_c_place
+,order_limit_sign
+,order_alliance_sign
+,order_shortcut_sign
+,order_overdue_time
+,ip
+,order_channel
+
+
+,resubmit_path
+,finance_version
+,referrer
+
+,kid
+,aid
+,last_aid
+,last_kid
+,case when b.basic_order_id is not null then 101 --退费重算原单
+      when discount_recall=2 then 401 -- 退费重算-H单
+      when discount_recall=3 then 201 --退费重算-新单
+      when order_type=3 then 300 -- 退课 R单
+      when order_type=1 then 100 -- 购买
+      when order_type=2 then 200 --换课新单
+      when order_type=4 then 400 --H单
+      else 999 end as sub_order_type
+,order_class_type
+,put_source_channel
+</code></pre>
+<p>from mds_sales_order_product_detail_temp a<br>left join<br>(<br>        SELECT  basic_order_id<br>               ,product_id<br>        FROM dwd_sales_order_product_detail_temp<br>        WHERE discount_recall = 2<br>        GROUP BY  basic_order_id<br>                 ,product_id<br>) b<br>ON a.order_id = b.basic_order_id AND a.product_id = b.product_id ;</p>
+<pre><code>
+
+### 4. 在线教育数仓模型体系（星形如何构造出来）
+
+### 5. 在线教育指标体系/报表层如何构建
+
+### 6. 数仓开发hive实践指南
+
+#### 6.1 hive基础语法
+
+</code></pre>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你支持我养家糊口！<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/img/zhifubaopay.jpeg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/img/weixinpay.jpeg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -220,200 +431,135 @@
 		</ul>
 	</div>
 
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2022/04/18/dw-in-education-md/" class="archive-article-date">
-  	<time datetime="2022-04-18T02:24:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-04-18</time>
-</a>
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2022/04/18/dw-in-education-md/">现代数据仓库的建设之路</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">dw</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">hadoop</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2022/02/14/linux-core-dump/" class="archive-article-date">
-  	<time datetime="2022-02-14T06:23:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-02-14</time>
-</a>
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2022/02/14/linux-core-dump/">be crash引起的IO高的问题</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">doris</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">abrt</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
       
-        </div></section>
+
       
+
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2021/11/15/doris-upgrade-md/" class="archive-article-date">
-  	<time datetime="2021-11-15T03:05:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-15</time>
-</a>
+      </div>
+    </span>
+  </div>
+</div>
 
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/11/15/doris-upgrade-md/">doris版本升级</a>
-    </h1>
-  
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=https://herden.gitee.io/2022/05/04/online-edu-dw/" alt="微信分享二维码">
+    </div>
+</div>
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">doris</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2021/08/29/debezium-sourcecode-plugin-architecture/" class="archive-article-date">
-  	<time datetime="2021-08-29T03:34:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-29</time>
-</a>
 
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2022/04/18/dw-in-education-md/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">现代数据仓库的建设之路</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/08/29/debezium-sourcecode-plugin-architecture/">【debezium源码分析】-插件架构</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">debezium</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%9C%A8%E7%BA%BF%E6%95%99%E8%82%B2%E4%B8%9A%E5%8A%A1%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">1. 在线教育业务技术介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E5%B1%82%E5%86%85%E5%AE%B9%E4%B8%8E%E6%A1%88%E4%BE%8B%E4%BB%8B%E7%BB%8D"><span class="toc-number">2.</span> <span class="toc-text">2. 数据同步层内容与案例介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-ODS%E5%B1%82%E4%BB%8B%E7%BB%8D"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 ODS层介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-MySQL%E4%B8%8A%E6%B8%B8%E8%A1%A8schema"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 MySQL上游表schema</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-%E6%A1%88%E4%BE%8B%E4%BB%8B%E7%BB%8D"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 案例介绍</span></a></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
   
-    </div></section>
   
 
-    
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/page/2/">2</a><a class="page-number" href="/archives/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/7/">7</a><a class="extend next" rel="next" href="/archives/page/2/">Next &amp;raquo;</a>
-    </nav>
+  
+
+  
+ 
+  <!-- 《utteranc评论：基于github issue的评论系统 -->
+
+    <section id="comments" class="comments">
+      <style>
+        .utterances{max-width: 100%;}
+      </style>
+        <script src="https://utteranc.es/client.js"
+                repo="xiangtao/blog-comment"
+                issue-term="title"
+                theme="github-light"
+                crossorigin="anonymous"
+                async>
+        </script>
+  </section>
+
+<!-- utteranc评论》 -->
+
   
 
 
@@ -449,8 +595,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

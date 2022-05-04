@@ -179,6 +179,84 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-online-edu-dw" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/05/04/online-edu-dw/">在线教育数据仓库建设</a>
+    </h1>
+  
+
+        
+        
+<a href="/2022/05/04/online-edu-dw/" class="archive-article-date">
+  	<time datetime="2022-05-04T08:26:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-05-04</time>
+</a>
+
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="1-在线教育业务技术介绍"><a href="#1-在线教育业务技术介绍" class="headerlink" title="1. 在线教育业务技术介绍"></a>1. 在线教育业务技术介绍</h3><h3 id="2-数据同步层内容与案例介绍"><a href="#2-数据同步层内容与案例介绍" class="headerlink" title="2. 数据同步层内容与案例介绍"></a>2. 数据同步层内容与案例介绍</h3><h4 id="2-1-ODS层介绍"><a href="#2-1-ODS层介绍" class="headerlink" title="2.1 ODS层介绍"></a>2.1 ODS层介绍</h4><p>ods层，全称operational data store 操作数据存储层。主要作用是存储业务数据库中的原始操作型数据，通过同步工具定时或者实时方式抽取到ods层，进行全量保存。ods层数据一般来说不进行数据清洗，保留和原始数据一样，方便最大化还原原始数据。</p>
+        
+          <a class="article-more-a" href="/2022/05/04/online-edu-dw/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">dw</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2022/05/04/online-edu-dw/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-dw-in-education-md" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -921,97 +999,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/08/12/mysql-binlog-replication-protocol/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-flink-cdc-source-code-analysis" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/24/flink-cdc-source-code-analysis/">【flink源码】Flink-cdc-connector源码分析</a>
-    </h1>
-  
-
-        
-        
-<a href="/2021/07/24/flink-cdc-source-code-analysis/" class="archive-article-date">
-  	<time datetime="2021-07-24T08:32:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-24</time>
-</a>
-
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="什么是cdc"><a href="#什么是cdc" class="headerlink" title="什么是cdc"></a>什么是cdc</h1><p>CDC 的全称是 Change Data Capture ，在广义的概念上，只要能捕获数据变更的技术，我们都可以称为 CDC 。通常我们说的 CDC 技术主要面向数据库的变更，是一种用于捕获数据库中数据变更的技术。<br>CDC 技术应用场景非常广泛：</p>
-<ul>
-<li>数据同步，用于备份，容灾</li>
-<li>数据分发，一个数据源分发给多个下游</li>
-<li>数据采集(E)，面向数据仓库/数据湖的 ETL 数据集成</li>
-</ul>
-        
-          <a class="article-more-a" href="/2021/07/24/flink-cdc-source-code-analysis/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">flink</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">binlog</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">flink-cdc</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/24/flink-cdc-source-code-analysis/">展开全文 >></a>
         </p>
       
 
